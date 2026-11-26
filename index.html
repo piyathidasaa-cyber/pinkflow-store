@@ -128,12 +128,12 @@
       <div class="flex items-center gap-2 sm:gap-3 flex-wrap">
         <button onclick="openEmailLoginModal()" class="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-slate-100 hover:bg-pink-50 border border-slate-200 text-slate-700 text-xs font-semibold transition cursor-pointer" title="คลิกเพื่อเปลี่ยนอีเมลบัญชีลูกค้า">
           <i class="fa-solid fa-user-check theme-text-primary"></i>
-          <span id="headerUserEmailDisplay" class="max-w-[140px] truncate">customer@gmail.com</span>
+          <span id="headerUserEmailDisplay" class="max-w-[160px] truncate">เข้าสู่ระบบ / กรอกอีเมล</span>
         </button>
 
         <button onclick="switchAppMode('STORE'); switchStoreTab('REWARDS')" class="hidden sm:flex items-center gap-1.5 px-3 py-2 rounded-xl bg-amber-50 border border-amber-200 text-amber-700 hover:bg-amber-100 transition text-xs font-bold cursor-pointer">
           <span>⭐</span>
-          <span id="headerPointsDisplay">120 แต้ม</span>
+          <span id="headerPointsDisplay">0 แต้ม</span>
         </button>
 
         <div class="flex items-center gap-2 bg-pink-50/80 border border-pink-200 px-3 py-1.5 rounded-2xl">
@@ -156,7 +156,7 @@
       </button>
       <button id="storeTabBtn-ORDERS" onclick="switchStoreTab('ORDERS')" class="px-3.5 py-2 rounded-xl text-xs sm:text-sm font-semibold text-slate-600 hover:bg-pink-50 transition whitespace-nowrap flex items-center gap-1.5 cursor-pointer">
         <span>📦 ประวัติสั่งซื้อ & อีเมล</span>
-        <span id="expiringAlertPill" class="px-1.5 py-0.5 text-[10px] bg-amber-500 text-white rounded-full font-bold">ใกล้หมดอายุ 1</span>
+        <span id="expiringAlertPill" class="hidden px-1.5 py-0.5 text-[10px] bg-amber-500 text-white rounded-full font-bold">ใกล้หมดอายุ 1</span>
       </button>
       <button id="storeTabBtn-REWARDS" onclick="switchStoreTab('REWARDS')" class="px-3.5 py-2 rounded-xl text-xs sm:text-sm font-semibold text-slate-600 hover:bg-pink-50 transition whitespace-nowrap cursor-pointer">
         🎁 โปรโมชั่น & แลกแต้มเงินสด
@@ -246,8 +246,8 @@
               </div>
               <div class="text-right bg-amber-50 border border-amber-200 px-4 py-2.5 rounded-2xl">
                 <div class="text-[11px] text-amber-700 font-medium">แต้มสะสมของคุณ</div>
-                <div id="rewardsPointsBalance" class="text-xl font-bold text-amber-600">120 แต้ม</div>
-                <div id="rewardsCashEquivalent" class="text-[11px] text-slate-500">มูลค่า ฿24.00</div>
+                <div id="rewardsPointsBalance" class="text-xl font-bold text-amber-600">0 แต้ม</div>
+                <div id="rewardsCashEquivalent" class="text-[11px] text-slate-500">มูลค่า ฿0.00</div>
               </div>
             </div>
 
@@ -296,11 +296,11 @@
               <p class="text-xs text-slate-500">สะสมยอดสั่งซื้อครบ ฿500 อัปเกรดเป็น <strong>Agent (-15%)</strong> และครบ ฿1,500 เป็น <strong>VIP (-25%)</strong> อัตโนมัติ</p>
               <div class="space-y-1.5">
                 <div class="flex justify-between text-xs font-semibold">
-                  <span>ยอดซื้อสะสม: <span id="totalSpendDisplay" class="theme-text-primary">฿320.00</span></span>
-                  <span id="nextTierTargetText" class="text-slate-500">อีก ฿180 ถึง Agent</span>
+                  <span>ยอดซื้อสะสม: <span id="totalSpendDisplay" class="theme-text-primary">฿0.00</span></span>
+                  <span id="nextTierTargetText" class="text-slate-500">อีก ฿500 ถึง Agent</span>
                 </div>
                 <div class="w-full h-2.5 bg-pink-100 rounded-full overflow-hidden">
-                  <div id="tierProgressBar" class="h-full theme-bg-primary rounded-full transition-all duration-500" style="width: 64%"></div>
+                  <div id="tierProgressBar" class="h-full theme-bg-primary rounded-full transition-all duration-500" style="width: 0%"></div>
                 </div>
               </div>
             </div>
@@ -318,9 +318,6 @@
                   คัดลอก
                 </button>
               </div>
-              <button onclick="simulateAffiliateCommission()" class="w-full py-2 rounded-xl bg-white hover:bg-pink-100 border border-pink-300 text-pink-700 text-xs font-bold transition cursor-pointer">
-                🧪 จำลองเพื่อนกดซื้อสินค้าผ่านลิงก์ (+฿35.00)
-              </button>
             </div>
           </div>
         </div>
@@ -371,7 +368,7 @@
           </button>
           <button id="adminTabBtn-PREORDERS" onclick="switchAdminTab('PREORDERS')" class="admin-tab-btn px-3 py-2 rounded-xl text-xs font-semibold text-slate-600 hover:bg-pink-50 transition flex items-center gap-1.5 cursor-pointer">
             <span>⏳ พรีออเดอร์ & อีเมล</span>
-            <span id="adminPreorderCountBadge" class="px-1.5 py-0.5 bg-rose-500 text-white text-[10px] rounded-full font-bold">1</span>
+            <span id="adminPreorderCountBadge" class="px-1.5 py-0.5 bg-rose-500 text-white text-[10px] rounded-full font-bold">0</span>
           </button>
           <button id="adminTabBtn-PRODUCTS" onclick="switchAdminTab('PRODUCTS')" class="admin-tab-btn px-3 py-2 rounded-xl text-xs font-semibold text-slate-600 hover:bg-pink-50 transition cursor-pointer">
             📦 จัดการสินค้า & รูปภาพ
@@ -414,7 +411,7 @@
           </div>
           <div class="bg-white p-5 rounded-3xl border border-pink-100 shadow-2xs">
             <div class="text-xs text-slate-500">พรีออเดอร์รอจัดส่ง</div>
-            <div id="adminStatPendingPre" class="text-2xl font-bold text-amber-600 mt-1">1 รายการ</div>
+            <div id="adminStatPendingPre" class="text-2xl font-bold text-amber-600 mt-1">0 รายการ</div>
             <button onclick="switchAdminTab('PREORDERS')" class="text-xs font-bold text-pink-600 hover:underline mt-1 cursor-pointer">จัดการจัดส่ง & ส่งเมล →</button>
           </div>
         </div>
@@ -682,7 +679,7 @@
         <p class="text-slate-600">กรอกอีเมลของคุณเพื่อดึงยอดเครดิต แต้มสะสม และประวัติคำสั่งซื้อจากฐานข้อมูล Supabase (หากยังไม่เคยใช้งาน ระบบจะสร้างบัญชีให้อัตโนมัติ)</p>
         <div>
           <label class="block font-bold text-slate-700 mb-1">อีเมลของคุณ</label>
-          <input id="loginEmailInput" type="email" value="customer@gmail.com" placeholder="you@email.com" class="w-full px-3.5 py-2.5 rounded-xl border border-pink-200 text-sm font-semibold" />
+          <input id="loginEmailInput" type="email" placeholder="you@email.com" onkeydown="if(event.key==='Enter') submitEmailLoginSync()" class="w-full px-3.5 py-2.5 rounded-xl border border-pink-200 text-sm font-semibold" />
         </div>
         <button onclick="submitEmailLoginSync()" class="w-full py-3 rounded-xl theme-bg-primary text-white text-sm font-bold shadow-xs cursor-pointer">
           ✅ ยืนยันเข้าสู่ระบบ & ซิงก์ข้อมูล
@@ -744,7 +741,7 @@
             <input id="checkoutUsePointsCheckbox" type="checkbox" onchange="recalculateCheckoutSummary()" class="accent-pink-600 w-4 h-4" />
             <span class="text-xs font-bold text-slate-800">ใช้แต้มสะสมแลกส่วนลดเงินสด</span>
           </div>
-          <span id="checkoutAvailablePointsDiscount" class="text-xs font-bold text-amber-700">มี 120 แต้ม</span>
+          <span id="checkoutAvailablePointsDiscount" class="text-xs font-bold text-amber-700">มี 0 แต้ม</span>
         </label>
 
         <div class="p-4 rounded-2xl bg-slate-50 border border-slate-200 space-y-1.5 text-xs">
@@ -904,7 +901,7 @@
   <div id="toastContainer" class="fixed bottom-4 right-4 z-50 space-y-2 max-w-sm pointer-events-none"></div>
 
   <script>
-    const STORAGE_KEY = 'pinkflow_store_prod_v6';
+    const STORAGE_KEY = 'pinkflow_store_prod_v7';
 
     const DEFAULT_STATE = {
       appMode: 'STORE',
@@ -913,7 +910,7 @@
       selectedCategory: 'ทั้งหมด',
       user: {
         id: 'usr_pink_001',
-        email: 'customer@gmail.com',
+        email: '',
         balance: 0.00,
         points: 0,
         totalSpend: 0.00,
@@ -1011,11 +1008,14 @@
 
     function loadState() {
       try {
-        const saved = localStorage.getItem(STORAGE_KEY) || localStorage.getItem('pinkflow_store_prod_v5');
+        const saved = localStorage.getItem(STORAGE_KEY) || localStorage.getItem('pinkflow_store_prod_v6');
         if (saved) {
           const parsed = JSON.parse(saved);
           const merged = Object.assign({}, DEFAULT_STATE, parsed);
           merged.settings = Object.assign({}, DEFAULT_STATE.settings, parsed.settings || {});
+          if (merged.user && merged.user.email === 'customer@gmail.com') {
+            merged.user.email = '';
+          }
           if (!merged.settings.promptpayId || merged.settings.promptpayId === '0812345678') {
             merged.settings.promptpayId = '0863807024';
           }
@@ -1207,6 +1207,9 @@
         (state.user.email && state.user.email !== 'customer@gmail.com')
           ? state.user.email
           : 'เข้าสู่ระบบ / กรอกอีเมล';
+
+      const logoHtml = s.logoUrl
+        ? `<img src="${s.logoUrl}" alt="Logo" class="w-full h-full object-cover" />`
         : `<i class="fa-solid ${s.logoIcon || 'fa-crown'}"></i>`;
 
       document.getElementById('headerLogoContainer').innerHTML = logoHtml;
@@ -1412,7 +1415,7 @@
         : 'px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-700';
 
       document.getElementById('checkoutPreorderFields').classList.toggle('hidden', !isPreorder);
-      document.getElementById('checkoutCustomerEmailInput').value = state.user.email || 'customer@gmail.com';
+      document.getElementById('checkoutCustomerEmailInput').value = state.user.email || '';
       document.getElementById('checkoutCustomerNoteInput').value = '';
 
       const couponSelect = document.getElementById('checkoutCouponSelect');
@@ -1771,7 +1774,7 @@
                 <div class="text-base font-bold theme-text-primary">฿${o.totalPaid.toFixed(2)}</div>
                 <div class="mt-1">
                   ${isPending
-                    ? `<button onclick="switchAppMode('ADMIN'); switchAdminTab('PREORDERS')" class="px-3 py-1.5 rounded-xl bg-amber-500 text-white text-xs font-bold cursor-pointer">🛡️ ไปหน้าแอดมินเพื่อส่งรหัส</button>`
+                    ? `<span class="text-[11px] text-amber-700 font-semibold">แอดมินกำลังจัดส่งเข้าอีเมล</span>`
                     : `<button onclick="openCustomerDeliveredEmail('${o.id}')" class="px-3 py-1.5 rounded-xl bg-white border border-pink-200 text-pink-700 text-xs font-bold cursor-pointer">📧 ดูอีเมลรับรหัส</button>`
                   }
                 </div>
@@ -1896,13 +1899,6 @@
       showToast(`🎉 แลก ${pts} แต้มเป็นเงิน ฿${finalCash.toFixed(2)} สำเร็จ!`, 'success');
     }
 
-    function simulateAffiliateCommission() {
-      state.user.balance += 35;
-      saveState();
-      renderAll();
-      showToast('🤝 รับค่าคอมมิชชันแนะนำเพื่อน +฿35.00 เรียบร้อย!', 'success');
-    }
-
     function renderApiTab() {
       document.getElementById('apiTestProductSelect').innerHTML = state.products.filter(p => p.mode === 'INSTANT').map(p =>
         `<option value="${p.id}">${p.name} — ราคา API: ฿${getProductPriceForUser(p)}</option>`
@@ -1918,6 +1914,11 @@
         return;
       }
       const price = getProductPriceForUser(p);
+      if (state.user.balance < price) {
+        consoleBox.textContent = JSON.stringify({ status: 400, error: 'INSUFFICIENT_BALANCE' }, null, 2);
+        showToast('ยอดเครดิตไม่เพียงพอสำหรับทดสอบ API', 'error');
+        return;
+      }
       state.user.balance -= price;
       const code = p.codes.shift();
       consoleBox.textContent = JSON.stringify({ status: 200, product: p.name, deliveredItem: code }, null, 2);
@@ -2210,7 +2211,9 @@
       if (!isAdminAccount()) state.appMode = 'STORE';
       switchAppMode(state.appMode === 'ADMIN' ? 'STORE' : (state.appMode || 'STORE'));
       renderAll();
-      submitEmailLoginSync(true);
+      if (state.user.email) {
+        submitEmailLoginSync(true);
+      }
     });
   </script>
 </body>
