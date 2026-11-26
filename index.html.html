@@ -1,0 +1,209 @@
+<!-- ... existing code ... -->
+        <button id="adminTabBtn-COUPONS" onclick="switchAdminTab('COUPONS')" class="admin-tab-btn px-3 py-2 rounded-xl text-xs font-semibold transition cursor-pointer">
+          🎟️ โค้ดส่วนลด
+        </button>
+        <button id="adminTabBtn-CUSTOMIZE" onclick="switchAdminTab('CUSTOMIZE')" class="admin-tab-btn px-3 py-2 rounded-xl text-xs font-semibold transition cursor-pointer">
+          🎨 แต่งร้านค้า & โลโก้
+        </button>
+        <button id="adminTabBtn-DEPLOY" onclick="switchAdminTab('DEPLOY')" class="admin-tab-btn px-3 py-2 rounded-xl text-xs font-semibold transition cursor-pointer">
+          🚀 นำขึ้น Netlify จริง
+        </button>
+      </div>
+    </div>
+<!-- ... existing code ... -->
+    <!-- ADMIN TAB 5.7: NETLIFY PRODUCTION BRIDGE & EXPORT -->
+    <div id="adminPanel-DEPLOY" class="hidden bg-white p-5 sm:p-6 rounded-3xl border border-pink-100 shadow-2xs space-y-6">
+      <div class="flex flex-wrap items-center justify-between gap-3 border-b border-pink-100 pb-4">
+        <div>
+          <span class="px-3 py-1 rounded-full text-xs font-bold bg-emerald-100 text-emerald-700">Ready for Netlify Hosting</span>
+          <h3 class="text-base sm:text-lg font-bold text-slate-900 mt-1.5">🚀 ส่งออกโค้ดทั้งหมด & เชื่อมต่อระบบจริงบน Netlify</h3>
+          <p class="text-xs text-slate-500">ดาวน์โหลดไฟล์ index.html ฉบับสมบูรณ์พร้อมข้อมูลร้านค้าของคุณ หรือตั้งค่าเชื่อมต่อ Netlify Functions (EasySlip API) และ Email Webhook</p>
+        </div>
+        <button onclick="downloadStandaloneHtmlForNetlify()" class="px-4 py-2.5 rounded-xl theme-bg-primary text-white text-xs sm:text-sm font-bold shadow-sm flex items-center gap-2 cursor-pointer">
+          <i class="fa-solid fa-download"></i> ดาวน์โหลดไฟล์ index.html พร้อมอัปโหลดขึ้น Netlify
+        </button>
+      </div>
+
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+        <!-- Left 7 Cols: Live Production API Settings -->
+        <div class="lg:col-span-7 bg-pink-50/50 border border-pink-200 rounded-2xl p-5 space-y-4">
+          <div class="flex items-center justify-between">
+            <h4 class="text-sm font-bold text-slate-900">🔌 ตั้งค่าเชื่อมต่อ API จริง (Production Mode)</h4>
+            <label class="inline-flex items-center gap-2 cursor-pointer">
+              <input id="liveProductionModeCheckbox" type="checkbox" class="accent-pink-600 w-4 h-4" />
+              <span class="text-xs font-bold text-pink-700">เปิดโหมดยิง API จริง</span>
+            </label>
+          </div>
+
+          <div class="space-y-3 text-xs">
+            <div>
+              <label class="block font-bold text-slate-700 mb-1">Netlify Function URL สำหรับตรวจสลิป EasySlip</label>
+              <input id="liveSlipEndpointInput" type="text" value="/.netlify/functions/verify-slip" placeholder="/.netlify/functions/verify-slip" class="w-full px-3.5 py-2 rounded-xl border border-pink-200 bg-white font-mono-code text-slate-800" />
+              <p class="text-[11px] text-slate-500 mt-1">ระบบจะส่งไฟล์รูปสลิปแบบ FormData ไปยัง Endpoint นี้แทนการจำลอง เพื่อซ่อน EASYSLIP_ACCESS_TOKEN ไว้บนเซิร์ฟเวอร์ Netlify อย่างปลอดภัย</p>
+            </div>
+
+            <div>
+              <label class="block font-bold text-slate-700 mb-1">Email Webhook URL (สำหรับส่งอีเมลแจ้งเตือนพรีออเดอร์ & รหัสสินค้าจริง)</label>
+              <input id="liveEmailWebhookInput" type="text" placeholder="เช่น https://hook.eu1.make.com/... หรือ /.netlify/functions/send-email" class="w-full px-3.5 py-2 rounded-xl border border-pink-200 bg-white font-mono-code text-slate-800" />
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div>
+                <label class="block font-bold text-slate-700 mb-1">เบอร์พร้อมเพย์รับเงินจริง</label>
+                <input id="livePromptPayInput" type="text" placeholder="0812345678" class="w-full px-3.5 py-2 rounded-xl border border-pink-200 bg-white font-mono-code text-slate-800" />
+              </div>
+              <div>
+                <label class="block font-bold text-slate-700 mb-1">อีเมลแอดมินรับแจ้งเตือน</label>
+                <input id="liveAdminEmailInput" type="email" placeholder="admin@pinkflow.store" class="w-full px-3.5 py-2 rounded-xl border border-pink-200 bg-white text-slate-800" />
+              </div>
+            </div>
+          </div>
+
+          <button onclick="saveNetlifyProductionConfig()" class="w-full py-2.5 rounded-xl theme-bg-primary text-white text-xs sm:text-sm font-bold shadow-xs cursor-pointer">
+            💾 บันทึกการตั้งค่าเชื่อมต่อระบบจริง
+          </button>
+        </div>
+
+        <!-- Right 5 Cols: Checklist for Netlify Deployment -->
+        <div class="lg:col-span-5 bg-slate-900 text-slate-100 rounded-2xl p-5 space-y-3.5 text-xs">
+          <div class="text-sm font-bold text-pink-300">📋 เช็กลิสต์นำเว็บขึ้น Netlify ภายใน 3 นาที</div>
+          <ol class="space-y-2.5 text-slate-300 list-decimal list-inside">
+            <li>กดปุ่ม <strong class="text-white">"ดาวน์โหลดไฟล์ index.html"</strong> ด้านบน (หรือคัดลอกโค้ดทั้งหมดในหน้าต่างฝั่งขวาบันทึกเป็นไฟล์ <code class="text-pink-300">index.html</code>)</li>
+            <li>สร้างโฟลเดอร์ใหม่ในคอมพิวเตอร์ชื่อ <code class="text-pink-300">pinkflow-store</code> แล้วนำไฟล์ <code class="text-pink-300">index.html</code> ใส่ไว้ด้านใน</li>
+            <li>เข้าเว็บไซต์ <strong class="text-emerald-300">app.netlify.com/drop</strong> แล้วลากโฟลเดอร์ไปวาง เว็บจะออนไลน์ทันที</li>
+            <li>หากต้องการใช้ EasySlip ตรวจสลิปจริง ให้เพิ่ม <code class="text-amber-300">EASYSLIP_ACCESS_TOKEN</code> ในเมนู <em>Environment variables</em> ของ Netlify</li>
+          </ol>
+          <div class="p-3 rounded-xl bg-slate-800 border border-slate-700 text-[11px] text-slate-400">
+            💡 เคล็ดลับ: ข้อมูลสินค้า โลโก้ และธีมสีที่คุณปรับแต่งไว้ในหน้านี้ จะถูกฝังลงในไฟล์ <code class="text-pink-300">index.html</code> อัตโนมัติเมื่อกดปุ่มดาวน์โหลดค่ะ
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ADMIN TAB 6: STORE CUSTOMIZATION & LOGO -->
+<!-- ... existing code ... -->
+    // =========================================================================
+    // 8.6 NETLIFY PRODUCTION BRIDGE & STANDALONE HTML EXPORT
+    // =========================================================================
+    function populateNetlifyDeployPanel() {
+      const s = state.settings || {};
+      const liveCheck = document.getElementById('liveProductionModeCheckbox');
+      if (liveCheck) liveCheck.checked = Boolean(s.liveProductionMode);
+      const slipInput = document.getElementById('liveSlipEndpointInput');
+      if (slipInput) slipInput.value = s.liveSlipEndpoint || '/.netlify/functions/verify-slip';
+      const emailInput = document.getElementById('liveEmailWebhookInput');
+      if (emailInput) emailInput.value = s.liveEmailWebhook || '';
+      const ppInput = document.getElementById('livePromptPayInput');
+      if (ppInput) ppInput.value = s.promptpayId || '';
+      const admInput = document.getElementById('liveAdminEmailInput');
+      if (admInput) admInput.value = s.adminEmail || '';
+    }
+
+    function saveNetlifyProductionConfig() {
+      state.settings.liveProductionMode = Boolean(document.getElementById('liveProductionModeCheckbox')?.checked);
+      state.settings.liveSlipEndpoint = document.getElementById('liveSlipEndpointInput')?.value.trim() || '/.netlify/functions/verify-slip';
+      state.settings.liveEmailWebhook = document.getElementById('liveEmailWebhookInput')?.value.trim() || '';
+      const newPp = document.getElementById('livePromptPayInput')?.value.trim();
+      const newAdm = document.getElementById('liveAdminEmailInput')?.value.trim();
+      if (newPp) state.settings.promptpayId = newPp;
+      if (newAdm) state.settings.adminEmail = newAdm;
+
+      saveState();
+      renderAll();
+      showToast(
+        state.settings.liveProductionMode
+          ? 'บันทึกและเปิดโหมดเชื่อมต่อ API จริงสำหรับ Netlify เรียบร้อยแล้ว!'
+          : 'บันทึกการตั้งค่าเรียบร้อยแล้ว (โหมดทดสอบเดโม่)',
+        'success'
+      );
+    }
+
+    function downloadStandaloneHtmlForNetlify() {
+      try {
+        const rawHtml = '<!DOCTYPE html>\n' + document.documentElement.outerHTML;
+        const blob = new Blob([rawHtml], { type: 'text/html;charset=utf-8' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'index.html';
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+        showToast('📥 ดาวน์โหลดไฟล์ index.html เรียบร้อย! สามารถนำไปอัปโหลดขึ้น Netlify ได้ทันทีค่ะ', 'success');
+      } catch (err) {
+        showToast('ไม่สามารถสร้างไฟล์ดาวน์โหลดได้ กรุณาคัดลอกโค้ดจากหน้าต่างด้านขวาแทนค่ะ', 'error');
+      }
+    }
+
+    // Wrap switchAdminTab to support DEPLOY tab cleanly
+    const _baseSwitchAdminTab = typeof switchAdminTab === 'function' ? switchAdminTab : null;
+    switchAdminTab = function(tab) {
+      const deployBtn = document.getElementById('adminTabBtn-DEPLOY');
+      const deployPanel = document.getElementById('adminPanel-DEPLOY');
+      if (tab === 'DEPLOY') {
+        state.adminTab = 'DEPLOY';
+        ['OVERVIEW', 'PREORDERS', 'PRODUCTS', 'STOCKS', 'SLIPS', 'COUPONS', 'CUSTOMIZE'].forEach(t => {
+          const btn = document.getElementById(`adminTabBtn-${t}`);
+          const panel = document.getElementById(`adminPanel-${t}`);
+          if (btn) btn.className = 'admin-tab-btn px-3 py-2 rounded-xl text-xs font-semibold transition text-slate-600 hover:bg-pink-50 cursor-pointer';
+          if (panel) panel.classList.add('hidden');
+        });
+        if (deployBtn) deployBtn.className = 'admin-tab-btn px-3 py-2 rounded-xl text-xs font-bold transition theme-bg-light theme-text-primary cursor-pointer';
+        if (deployPanel) deployPanel.classList.remove('hidden');
+        populateNetlifyDeployPanel();
+        saveState();
+        return;
+      }
+      if (deployBtn) deployBtn.className = 'admin-tab-btn px-3 py-2 rounded-xl text-xs font-semibold transition text-slate-600 hover:bg-pink-50 cursor-pointer';
+      if (deployPanel) deployPanel.classList.add('hidden');
+      if (_baseSwitchAdminTab) _baseSwitchAdminTab(tab);
+    };
+
+    // Wrap handleRealSlipFileUpload to support Live Netlify Function endpoint when enabled
+    const _baseHandleRealSlipFileUpload = typeof handleRealSlipFileUpload === 'function' ? handleRealSlipFileUpload : null;
+    handleRealSlipFileUpload = async function(event) {
+      const file = event?.target?.files?.[0];
+      if (!file) return;
+
+      if (state.settings?.liveProductionMode && state.settings?.liveSlipEndpoint) {
+        try {
+          showToast('กำลังส่งสลิปไปตรวจสอบผ่าน Netlify Function & EasySlip API...', 'info');
+          const formData = new FormData();
+          formData.append('file', file);
+          formData.append('userId', state.user.id);
+
+          const res = await fetch(state.settings.liveSlipEndpoint, {
+            method: 'POST',
+            body: formData
+          });
+          const data = await res.json();
+
+          if (res.ok && data.success) {
+            const added = Number(data.amount || 0);
+            state.user.balance += added;
+            saveState();
+            renderAll();
+            showToast(`✅ ตรวจสอบสลิปจริงสำเร็จ +฿${added.toFixed(2)}`, 'success');
+          } else {
+            showToast(data.error || 'ตรวจสอบสลิปไม่ผ่าน กรุณาตรวจสอบอีกครั้ง', 'error');
+          }
+          return;
+        } catch (err) {
+          showToast('ยังไม่พบ Endpoint บนเซิร์ฟเวอร์ สลับเป็นโหมดทดสอบให้อัตโนมัติค่ะ', 'info');
+        }
+      }
+
+      if (_baseHandleRealSlipFileUpload) {
+        _baseHandleRealSlipFileUpload(event);
+      }
+    };
+
+    // Expose all handlers globally for inline HTML onclick/onchange
+    Object.assign(window, {
+      switchAdminTab,
+      handleRealSlipFileUpload,
+      populateNetlifyDeployPanel,
+      saveNetlifyProductionConfig,
+      downloadStandaloneHtmlForNetlify,
+<!-- ... existing code ... -->
