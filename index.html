@@ -8,6 +8,9 @@
   <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
 
+  <!-- QRCode.js Library for Real Scannable PromptPay QR -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+
   <!-- Google Fonts: Prompt & JetBrains Mono -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -52,6 +55,15 @@
       to { opacity: 1; transform: translateY(0); }
     }
     .animate-fade-up { animation: fadeSlideUp 0.25s ease-out forwards; }
+
+    #dynamicQrSvgBox img,
+    #dynamicQrSvgBox canvas {
+      margin: 0 auto;
+      display: block;
+      width: 100% !important;
+      height: 100% !important;
+      object-fit: contain;
+    }
   </style>
 </head>
 <body class="min-h-screen flex flex-col">
@@ -121,7 +133,7 @@
         <div class="flex items-center gap-2 bg-pink-50/80 border border-pink-200 px-3 py-1.5 rounded-2xl">
           <div class="text-right">
             <div class="text-[10px] text-slate-500 leading-tight">เครดิตคงเหลือ</div>
-            <div id="headerBalanceDisplay" class="text-sm sm:text-base font-bold theme-text-primary leading-tight">฿450.00</div>
+            <div id="headerBalanceDisplay" class="text-sm sm:text-base font-bold theme-text-primary leading-tight">฿0.00</div>
           </div>
           <button onclick="openTopupModal()" class="px-3 py-2 rounded-xl theme-bg-primary text-white text-xs font-bold shadow-xs transition flex items-center gap-1.5 cursor-pointer">
             <i class="fa-solid fa-plus"></i>
@@ -295,8 +307,8 @@
             <div class="bg-gradient-to-br from-pink-50 to-rose-50 p-5 rounded-3xl border border-pink-200 space-y-3">
               <h3 class="text-sm font-bold text-pink-900">🤝 ชวนเพื่อนช้อป รับค่าคอมมิชชัน 10%</h3>
               <div class="flex items-center gap-2">
-                <input id="affiliateLinkInput" type="text" readonly value="https://pinkflow.store/?ref=PINK888" class="flex-1 px-3 py-2 rounded-xl bg-white border border-pink-200 text-xs font-mono-code text-slate-700" />
-                <button onclick="copyTextValue('https://pinkflow.store/?ref=PINK888', 'คัดลอกลิงก์แนะนำเพื่อนแล้ว!')" class="px-3 py-2 rounded-xl theme-bg-primary text-white text-xs font-bold cursor-pointer">
+                <input id="affiliateLinkInput" type="text" readonly value="https://pinkflow-store.netlify.app/?ref=PINK888" class="flex-1 px-3 py-2 rounded-xl bg-white border border-pink-200 text-xs font-mono-code text-slate-700" />
+                <button onclick="copyTextValue('https://pinkflow-store.netlify.app/?ref=PINK888', 'คัดลอกลิงก์แนะนำเพื่อนแล้ว!')" class="px-3 py-2 rounded-xl theme-bg-primary text-white text-xs font-bold cursor-pointer">
                   คัดลอก
                 </button>
               </div>
@@ -371,7 +383,7 @@
             🎨 แต่งร้านค้า & โลโก้
           </button>
           <button id="adminTabBtn-DEPLOY" onclick="switchAdminTab('DEPLOY')" class="admin-tab-btn px-3 py-2 rounded-xl text-xs font-semibold text-slate-600 hover:bg-pink-50 transition cursor-pointer">
-            🚀 ตั้งค่า API & Netlify
+            🚀 ตั้งค่า API & พร้อมเพย์
           </button>
         </div>
       </div>
@@ -424,7 +436,7 @@
           <div class="grid grid-cols-1 md:grid-cols-3 gap-3 items-end">
             <div>
               <label class="block text-xs font-bold text-slate-700 mb-1">อีเมลหลักของแอดมิน</label>
-              <input id="adminMainEmailInput" type="email" value="admin@pinkflow.store" class="w-full px-3.5 py-2 rounded-xl border border-pink-200 text-sm" />
+              <input id="adminMainEmailInput" type="email" value="pigiria9@gmail.com" class="w-full px-3.5 py-2 rounded-xl border border-pink-200 text-sm" />
             </div>
             <div>
               <label class="block text-xs font-bold text-slate-700 mb-1">อีเมลสำเนา (CC)</label>
@@ -593,16 +605,16 @@
       <div id="adminPanel-DEPLOY" class="hidden bg-white p-6 rounded-3xl border border-pink-100 shadow-2xs space-y-6">
         <div class="flex flex-wrap items-center justify-between gap-3 border-b border-pink-100 pb-4">
           <div>
-            <span class="px-3 py-1 rounded-full text-xs font-bold bg-emerald-100 text-emerald-700">Production Ready</span>
-            <h3 class="text-lg font-bold text-slate-900 mt-1.5">🚀 ตั้งค่าการเชื่อมต่อ Netlify Functions (Supabase + Slip2Go/EasySlip + Resend)</h3>
-            <p class="text-xs text-slate-500">ระบบจะเรียกใช้ Netlify Functions อัตโนมัติทันทีเมื่ออัปโหลดขึ้นเว็บจริง</p>
+            <span class="px-3 py-1 rounded-full text-xs font-bold bg-emerald-100 text-emerald-700">Real PromptPay EMVCo + API Ready</span>
+            <h3 class="text-lg font-bold text-slate-900 mt-1.5">🚀 ตั้งค่าเลขพร้อมเพย์รับเงิน & การเชื่อมต่อระบบจริง</h3>
+            <p class="text-xs text-slate-500">QR Code หน้าเติมเงินจะสร้างตามเลขพร้อมเพย์และยอดโอนจริงทันที</p>
           </div>
         </div>
 
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
           <div class="lg:col-span-7 bg-pink-50/50 border border-pink-200 rounded-2xl p-5 space-y-4">
             <div class="flex items-center justify-between">
-              <h4 class="text-sm font-bold text-slate-900">🔌 Endpoint การทำงานของระบบจริง</h4>
+              <h4 class="text-sm font-bold text-slate-900">🔌 ตั้งค่าบัญชีรับเงินและ Endpoint</h4>
               <label class="inline-flex items-center gap-2 cursor-pointer">
                 <input id="liveProductionModeCheckbox" type="checkbox" checked class="accent-pink-600 w-4 h-4" />
                 <span class="text-xs font-bold text-pink-700">เปิดใช้งาน API จริงอัตโนมัติ</span>
@@ -610,6 +622,16 @@
             </div>
 
             <div class="space-y-3 text-xs">
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div>
+                  <label class="block font-bold text-slate-700 mb-1">เบอร์พร้อมเพย์ / เลขบัตร ปชช. ร้านค้า</label>
+                  <input id="livePromptPayInput" type="text" value="0863807024" class="w-full px-3.5 py-2 rounded-xl border border-pink-200 bg-white font-mono-code font-bold text-slate-800" />
+                </div>
+                <div>
+                  <label class="block font-bold text-slate-700 mb-1">อีเมลแอดมินรับแจ้งเตือน</label>
+                  <input id="liveAdminEmailInput" type="email" value="pigiria9@gmail.com" class="w-full px-3.5 py-2 rounded-xl border border-pink-200 bg-white text-slate-800" />
+                </div>
+              </div>
               <div>
                 <label class="block font-bold text-slate-700 mb-1">Netlify Function ตรวจสลิป (Slip2Go / EasySlip)</label>
                 <input id="liveSlipEndpointInput" type="text" value="/.netlify/functions/verify-slip" class="w-full px-3.5 py-2 rounded-xl border border-pink-200 bg-white font-mono-code text-slate-800" />
@@ -617,16 +639,6 @@
               <div>
                 <label class="block font-bold text-slate-700 mb-1">Netlify Function สั่งซื้อ & ตัดสต็อก Supabase</label>
                 <input id="liveOrderEndpointInput" type="text" value="/.netlify/functions/place-order" class="w-full px-3.5 py-2 rounded-xl border border-pink-200 bg-white font-mono-code text-slate-800" />
-              </div>
-              <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                <div>
-                  <label class="block font-bold text-slate-700 mb-1">เบอร์พร้อมเพย์ที่แสดงหน้า QR</label>
-                  <input id="livePromptPayInput" type="text" value="0812345678" class="w-full px-3.5 py-2 rounded-xl border border-pink-200 bg-white font-mono-code text-slate-800" />
-                </div>
-                <div>
-                  <label class="block font-bold text-slate-700 mb-1">อีเมลแอดมินรับแจ้งเตือน</label>
-                  <input id="liveAdminEmailInput" type="email" value="admin@pinkflow.store" class="w-full px-3.5 py-2 rounded-xl border border-pink-200 bg-white text-slate-800" />
-                </div>
               </div>
             </div>
 
@@ -636,12 +648,11 @@
           </div>
 
           <div class="lg:col-span-5 bg-slate-900 text-slate-100 rounded-2xl p-5 space-y-3 text-xs">
-            <div class="text-sm font-bold text-pink-300">✅ รายการเชื่อมต่อระบบหลังบ้าน</div>
+            <div class="text-sm font-bold text-pink-300">✅ ระบบ QR พร้อมเพย์มาตรฐาน EMVCo</div>
             <div class="space-y-2 text-slate-300">
-              <div>• <strong>ซิงก์บัญชีลูกค้า:</strong> <code class="text-pink-300">/.netlify/functions/user-sync</code></div>
-              <div>• <strong>ตรวจสลิปโอนเงิน:</strong> <code class="text-pink-300">/.netlify/functions/verify-slip</code></div>
-              <div>• <strong>สั่งซื้อ & แจ้งเตือนเมล:</strong> <code class="text-pink-300">/.netlify/functions/place-order</code></div>
-              <div class="pt-2 text-emerald-300">ระบบรองรับทั้ง Slip2Go API และ EasySlip API โดยอัตโนมัติตามค่า Environment Variables บน Netlify ค่ะ</div>
+              <div>• รองรับเบอร์มือถือ 10 หลัก (เช่น <code class="text-pink-300">0863807024</code>) และเลขบัตรประชาชน 13 หลัก</div>
+              <div>• ล็อกยอดโอนอัตโนมัติ ลูกค้าสแกนด้วยแอปธนาคารใดก็ได้ ไม่ต้องพิมพ์ยอดเอง</div>
+              <div>• ตรวจสอบสลิปผ่าน <code class="text-pink-300">Slip2Go</code> และอัปเดตเครดิตลง <code class="text-pink-300">Supabase</code> อัตโนมัติ</div>
             </div>
           </div>
         </div>
@@ -765,10 +776,11 @@
           </div>
 
           <div class="p-4 rounded-2xl bg-gradient-to-b from-sky-50 to-white border border-sky-200 text-center space-y-2">
-            <div class="text-xs font-bold text-sky-800 tracking-wide">THAI QR PAYMENT • พร้อมเพย์</div>
-            <div id="dynamicQrSvgBox" class="w-40 h-40 mx-auto bg-white p-2.5 rounded-xl border border-slate-200 shadow-2xs flex items-center justify-center"></div>
+            <div class="text-xs font-bold text-sky-800 tracking-wide">THAI QR PAYMENT • พร้อมเพย์แท้</div>
+            <div id="dynamicQrSvgBox" class="w-44 h-44 mx-auto bg-white p-2.5 rounded-xl border border-slate-200 shadow-2xs flex items-center justify-center"></div>
             <div class="text-sm font-bold theme-text-primary">ยอดโอน: <span id="qrAmountDisplay">฿100.00</span></div>
-            <div class="text-[11px] text-slate-500">พร้อมเพย์: <span id="qrPromptPayIdDisplay" class="font-mono-code font-semibold">081-234-5678</span></div>
+            <div class="text-[11px] text-slate-500">พร้อมเพย์: <span id="qrPromptPayIdDisplay" class="font-mono-code font-semibold">0863807024</span></div>
+            <div class="text-[10px] text-emerald-700 font-medium">✅ สแกนผ่านแอปธนาคารได้ทันที ระบบล็อกยอดอัตโนมัติ</div>
           </div>
         </div>
 
@@ -862,7 +874,7 @@
   <div id="toastContainer" class="fixed bottom-4 right-4 z-50 space-y-2 max-w-sm pointer-events-none"></div>
 
   <script>
-    const STORAGE_KEY = 'pinkflow_store_prod_v5';
+    const STORAGE_KEY = 'pinkflow_store_prod_v6';
 
     const DEFAULT_STATE = {
       appMode: 'STORE',
@@ -872,9 +884,9 @@
       user: {
         id: 'usr_pink_001',
         email: 'customer@gmail.com',
-        balance: 450.00,
-        points: 120,
-        totalSpend: 320.00,
+        balance: 0.00,
+        points: 0,
+        totalSpend: 0.00,
         tier: 'MEMBER',
         apiKey: 'pk_live_pinkflow_98a7f6d5e4c3'
       },
@@ -886,8 +898,8 @@
         logoUrl: '',
         logoIcon: 'fa-crown',
         themeKey: 'rose',
-        promptpayId: '0812345678',
-        adminEmail: 'admin@pinkflow.store',
+        promptpayId: '0863807024',
+        adminEmail: 'pigiria9@gmail.com',
         adminCcEmail: 'support@pinkflow.store',
         adminPreorderEmailAlert: true,
         liveProductionMode: true,
@@ -904,23 +916,14 @@
         { id: 'p7', name: 'CapCut Pro (30 วัน ครบทุกฟีเจอร์)', category: 'กราฟิก & ตัดต่อ', mode: 'INSTANT', price: 79, cost: 35, image: 'https://placehold.co/400x240/ffe4e6/e11d48?text=CapCut+Pro+Editor', codes: ['capcut_pro01@pinkflow.store : Cc998877'] },
         { id: 'p8', name: 'Spotify Premium Individual (30 วัน)', category: 'ฟังเพลง', mode: 'INSTANT', price: 45, cost: 18, image: 'https://placehold.co/400x240/dcfce7/15803d?text=Spotify+Premium', codes: ['https://spotify.com/th/invite/PF901'] }
       ],
-      orders: [
-        { id: 'ORD-2026-881', productId: 'p1', productName: 'Netflix Premium 4K (30 วัน)', mode: 'INSTANT', qty: 1, totalPaid: 99, status: 'COMPLETED', deliveredData: ['nf_vip00@pinkflow.store : Pass1122 (จอ 4)'], customerEmail: 'customer@gmail.com', daysRemaining: 2, createdAt: '24/11/2026 14:20' },
-        { id: 'ORD-2026-882', productId: 'p3', productName: 'ChatGPT Plus GPT-4o (ส่วนตัว 30 วัน)', mode: 'PREORDER', qty: 1, totalPaid: 259, status: 'PENDING_PREORDER', deliveredData: [], customerEmail: 'customer@gmail.com', note: 'ขออัปเกรดเข้าเมล customer@gmail.com ค่า', daysRemaining: 30, createdAt: '26/11/2026 22:45' }
-      ],
-      adminEmailAlerts: [
-        { id: 'MAIL-ADM-01', orderId: 'ORD-2026-882', productName: 'ChatGPT Plus GPT-4o (ส่วนตัว 30 วัน)', customerEmail: 'customer@gmail.com', note: 'ขออัปเกรดเข้าเมล customer@gmail.com ค่า', amount: 259, isRead: false, sentAt: '26/11/2026 22:45' }
-      ],
-      slipLogs: [
-        { transRef: '202611269988776655', amount: 300, status: 'SUCCESS', note: 'ตรวจผ่านระบบอัตโนมัติ • เติมเครดิตสำเร็จ', time: '26/11/2026 20:15' }
-      ],
+      orders: [],
+      adminEmailAlerts: [],
+      slipLogs: [],
       coupons: [
         { code: 'WELCOME20', discount: 20, minSpend: 50, quota: 45 },
         { code: 'PINK10', discount: 10, minSpend: 30, quota: 80 }
       ],
-      pointsHistory: [
-        { title: 'สั่งซื้อ ChatGPT Plus GPT-4o', points: '+25 แต้ม', time: '26/11/2026' }
-      ]
+      pointsHistory: []
     };
 
     let state = loadState();
@@ -928,14 +931,102 @@
 
     function loadState() {
       try {
-        const saved = localStorage.getItem(STORAGE_KEY);
-        if (saved) return Object.assign({}, DEFAULT_STATE, JSON.parse(saved));
+        const saved = localStorage.getItem(STORAGE_KEY) || localStorage.getItem('pinkflow_store_prod_v5');
+        if (saved) {
+          const parsed = JSON.parse(saved);
+          const merged = Object.assign({}, DEFAULT_STATE, parsed);
+          merged.settings = Object.assign({}, DEFAULT_STATE.settings, parsed.settings || {});
+          if (!merged.settings.promptpayId || merged.settings.promptpayId === '0812345678') {
+            merged.settings.promptpayId = '0863807024';
+          }
+          return merged;
+        }
       } catch (e) {}
       return JSON.parse(JSON.stringify(DEFAULT_STATE));
     }
 
     function saveState() {
       try { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); } catch (e) {}
+    }
+
+    // =========================================================================
+    // REAL THAI PROMPTPAY EMVCo QR GENERATOR (CRC-16/CCITT-FALSE)
+    // =========================================================================
+    function crc16ccitt(str) {
+      let crc = 0xFFFF;
+      for (let i = 0; i < str.length; i++) {
+        crc ^= str.charCodeAt(i) << 8;
+        for (let j = 0; j < 8; j++) {
+          if ((crc & 0x8000) !== 0) {
+            crc = ((crc << 1) ^ 0x1021) & 0xFFFF;
+          } else {
+            crc = (crc << 1) & 0xFFFF;
+          }
+        }
+      }
+      return crc.toString(16).toUpperCase().padStart(4, '0');
+    }
+
+    function buildThaiPromptPayPayload(promptpayId, amount) {
+      const cleanId = String(promptpayId || '').replace(/\D/g, '');
+      let targetTag = '';
+
+      if (cleanId.length === 10 && cleanId.startsWith('0')) {
+        const intlPhone = '0066' + cleanId.slice(1);
+        targetTag = '01' + String(intlPhone.length).padStart(2, '0') + intlPhone;
+      } else if (cleanId.length === 13) {
+        targetTag = '0213' + cleanId;
+      } else if (cleanId.length === 15) {
+        targetTag = '0315' + cleanId;
+      } else {
+        return null;
+      }
+
+      const aidTag = '0016A000000677010111';
+      const merchantInfo = aidTag + targetTag;
+      const tag29 = '29' + String(merchantInfo.length).padStart(2, '0') + merchantInfo;
+
+      const amtNum = Number(amount);
+      const hasAmount = !isNaN(amtNum) && amtNum > 0;
+      const initMethod = hasAmount ? '010212' : '010211';
+      const amtStr = hasAmount ? amtNum.toFixed(2) : '';
+      const tag54 = hasAmount ? ('54' + String(amtStr.length).padStart(2, '0') + amtStr) : '';
+
+      const rawPayload = '000201' + initMethod + tag29 + '5303764' + tag54 + '5802TH' + '6304';
+      const checksum = crc16ccitt(rawPayload);
+      return rawPayload + checksum;
+    }
+
+    function updateDynamicPromptPayQr() {
+      const amt = Math.max(1, Number(document.getElementById('topupAmountInput')?.value || 100));
+      document.getElementById('qrAmountDisplay').textContent = `฿${amt.toFixed(2)}`;
+      document.getElementById('qrPromptPayIdDisplay').textContent = state.settings.promptpayId;
+
+      const qrBox = document.getElementById('dynamicQrSvgBox');
+      if (!qrBox) return;
+      qrBox.innerHTML = '';
+
+      const payload = buildThaiPromptPayPayload(state.settings.promptpayId, amt);
+      if (!payload) {
+        qrBox.innerHTML = `<div class="text-[11px] text-rose-600 font-semibold p-2">กรุณาตั้งค่าเบอร์พร้อมเพย์ 10 หลัก หรือเลขบัตร 13 หลักให้ถูกต้อง</div>`;
+        return;
+      }
+
+      if (typeof QRCode !== 'undefined') {
+        new QRCode(qrBox, {
+          text: payload,
+          width: 160,
+          height: 160,
+          colorDark: '#0f172a',
+          colorLight: '#ffffff',
+          correctLevel: QRCode.CorrectLevel.M
+        });
+      } else {
+        const img = document.createElement('img');
+        img.src = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(payload)}`;
+        img.alt = 'PromptPay QR';
+        qrBox.appendChild(img);
+      }
     }
 
     // =========================================================================
@@ -968,7 +1059,7 @@
           state.user.balance = Number(data.user.balance || 0);
           state.user.points = Number(data.user.points || 0);
           state.user.tier = data.user.tier || 'MEMBER';
-          if (Array.isArray(data.orders) && data.orders.length > 0) {
+          if (Array.isArray(data.orders)) {
             state.orders = data.orders.map(o => ({
               id: o.id,
               productId: o.product_id,
@@ -986,7 +1077,7 @@
           }
           if (!silent) showToast(`✅ ซิงก์บัญชี ${email} กับฐานข้อมูล Supabase สำเร็จ!`, 'success');
         } else if (!silent) {
-          showToast(`เข้าสู่ระบบด้วยอีเมล ${email} เรียบร้อย`, 'info');
+          showToast(data.error || `เข้าสู่ระบบด้วยอีเมล ${email} เรียบร้อย`, 'info');
         }
       } catch (e) {
         if (!silent) showToast(`เข้าสู่ระบบด้วยอีเมล ${email} เรียบร้อย`, 'info');
@@ -1441,26 +1532,6 @@
       updateDynamicPromptPayQr();
     }
 
-    function updateDynamicPromptPayQr() {
-      const amt = Math.max(1, Number(document.getElementById('topupAmountInput')?.value || 100));
-      document.getElementById('qrAmountDisplay').textContent = `฿${amt.toFixed(2)}`;
-      document.getElementById('qrPromptPayIdDisplay').textContent = state.settings.promptpayId;
-
-      const seed = `${state.settings.promptpayId}-${amt}`;
-      let hash = 0;
-      for (let i = 0; i < seed.length; i++) hash = (hash << 5) - hash + seed.charCodeAt(i);
-      let cells = '';
-      const size = 11;
-      for (let r = 0; r < size; r++) {
-        for (let c = 0; c < size; c++) {
-          const isFinder = (r < 3 && c < 3) || (r < 3 && c >= size - 3) || (r >= size - 3 && c < 3);
-          const bit = isFinder || (((hash >> ((r * size + c) % 24)) ^ (r * 7 + c * 13)) & 1);
-          if (bit) cells += `<rect x="${c * 10 + 5}" y="${r * 10 + 5}" width="8" height="8" rx="1.5" fill="#0f172a"/>`;
-        }
-      }
-      document.getElementById('dynamicQrSvgBox').innerHTML = `<svg viewBox="0 0 120 120" class="w-full h-full">${cells}</svg>`;
-    }
-
     function handleRealSlipFileUpload(event) {
       const file = event?.target?.files?.[0];
       if (!file) return;
@@ -1573,6 +1644,11 @@
       }
 
       document.getElementById('totalOrdersCountBadge').textContent = `${state.orders.length} รายการ`;
+      if (state.orders.length === 0) {
+        document.getElementById('ordersListContainer').innerHTML = `<div class="text-center py-8 text-xs text-slate-500">ยังไม่มีประวัติคำสั่งซื้อในบัญชีนี้</div>`;
+        return;
+      }
+
       document.getElementById('ordersListContainer').innerHTML = state.orders.map(o => {
         const isPending = o.status === 'PENDING_PREORDER';
         return `
@@ -1677,7 +1753,7 @@
         <div class="flex items-center justify-between p-2.5 rounded-xl bg-slate-50 border border-slate-100 text-xs">
           <span>${h.title}</span><span class="font-bold text-emerald-600">${h.points}</span>
         </div>
-      `).join('');
+      `).join('') || `<div class="text-xs text-slate-400">ยังไม่มีประวัติการแลกแต้ม</div>`;
 
       document.getElementById('currentTierBadgeCard').textContent = state.user.tier;
       document.getElementById('totalSpendDisplay').textContent = `฿${state.user.totalSpend.toFixed(2)}`;
@@ -1772,7 +1848,7 @@
           <div class="text-[11px] text-slate-600">ลูกค้า: ${a.customerEmail}</div>
           <button onclick="openAdminAlertEmailPreview('${a.id}')" class="px-3 py-1 rounded-lg bg-white border border-pink-200 text-pink-700 text-[11px] font-bold cursor-pointer">👁️ เปิดอ่านอีเมล</button>
         </div>
-      `).join('');
+      `).join('') || `<div class="text-xs text-slate-400">ยังไม่มีอีเมลแจ้งเตือนพรีออเดอร์</div>`;
 
       document.getElementById('adminPreordersQueueList').innerHTML = state.orders.filter(o => o.mode === 'PREORDER').map(o => {
         const isPending = o.status === 'PENDING_PREORDER';
@@ -1790,7 +1866,7 @@
             ` : `<div class="text-xs font-mono-code text-emerald-800">รหัส: ${o.deliveredData.join(', ')}</div>`}
           </div>
         `;
-      }).join('');
+      }).join('') || `<div class="text-xs text-slate-400">ยังไม่มีรายการพรีออเดอร์</div>`;
 
       document.getElementById('adminProductsTable').innerHTML = state.products.map(p => `
         <div class="p-4 rounded-2xl border border-pink-100 flex flex-col justify-between gap-3">
@@ -1816,7 +1892,7 @@
           <div><span class="font-mono-code font-bold">Ref: ${log.transRef}</span><div class="text-slate-500">${log.note}</div></div>
           <span class="font-bold text-emerald-600">฿${log.amount} (${log.status})</span>
         </div>
-      `).join('');
+      `).join('') || `<div class="text-xs text-slate-400">ยังไม่มีรายการตรวจสลิป</div>`;
 
       document.getElementById('adminCouponsList').innerHTML = state.coupons.map(c => `
         <div class="p-3.5 rounded-2xl border border-pink-200 bg-pink-50/40 flex items-center justify-between text-xs">
@@ -1828,8 +1904,8 @@
       document.getElementById('liveProductionModeCheckbox').checked = Boolean(state.settings.liveProductionMode);
       document.getElementById('liveSlipEndpointInput').value = state.settings.liveSlipEndpoint || '/.netlify/functions/verify-slip';
       document.getElementById('liveOrderEndpointInput').value = state.settings.liveOrderEndpoint || '/.netlify/functions/place-order';
-      document.getElementById('livePromptPayInput').value = state.settings.promptpayId || '';
-      document.getElementById('liveAdminEmailInput').value = state.settings.adminEmail || '';
+      document.getElementById('livePromptPayInput').value = state.settings.promptpayId || '0863807024';
+      document.getElementById('liveAdminEmailInput').value = state.settings.adminEmail || 'pigiria9@gmail.com';
     }
 
     function toggleAdminEmailAlertSetting() {
@@ -1986,7 +2062,8 @@
       state.settings.adminEmail = document.getElementById('liveAdminEmailInput').value.trim() || state.settings.adminEmail;
       saveState();
       renderAll();
-      showToast('💾 บันทึกการตั้งค่าเรียบร้อย!', 'success');
+      updateDynamicPromptPayQr();
+      showToast('💾 บันทึกเลขพร้อมเพย์และการตั้งค่าเรียบร้อย!', 'success');
     }
 
     function closeModal(id) { document.getElementById(id)?.classList.add('hidden'); }
