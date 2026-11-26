@@ -75,14 +75,16 @@
         <button id="modeBtn-STORE" onclick="switchAppMode('STORE')" class="px-3 py-1.5 rounded-lg font-semibold transition flex items-center gap-1.5 theme-bg-primary text-white cursor-pointer">
           <span>🌸</span> <span>หน้าร้านค้า (Storefront)</span>
         </button>
-        <button id="modeBtn-ADMIN" onclick="switchAppMode('ADMIN')" class="px-3 py-1.5 rounded-lg font-semibold transition flex items-center gap-1.5 text-slate-300 hover:text-white cursor-pointer relative">
+        <!-- ปุ่ม Admin จะแสดงเฉพาะเมื่อล็อกอินด้วยอีเมลแอดมินเท่านั้น -->
+        <button id="modeBtn-ADMIN" onclick="switchAppMode('ADMIN')" class="hidden px-3 py-1.5 rounded-lg font-semibold transition flex items-center gap-1.5 text-slate-300 hover:text-white cursor-pointer relative">
           <span>🛡️</span> <span>ระบบหลังบ้าน (Admin)</span>
           <span id="adminUnreadBadge" class="hidden ml-1 px-1.5 py-0.2 bg-rose-500 text-white text-[10px] font-bold rounded-full">1</span>
         </button>
       </div>
 
-      <div id="tierSimulatorBar" class="flex items-center gap-1.5 flex-wrap">
-        <span class="text-slate-400 hidden md:inline">ระดับสมาชิก:</span>
+      <!-- แถบจำลองระดับสมาชิก: ซ่อนจากลูกค้าทั่วไป (แสดงเฉพาะแอดมินที่ปลดล็อก PIN แล้ว) -->
+      <div id="tierSimulatorBar" class="hidden flex items-center gap-1.5 flex-wrap">
+        <span class="text-slate-400 hidden md:inline">ทดสอบเรทราคา:</span>
         <button id="tierBtn-MEMBER" onclick="setUserTier('MEMBER')" class="px-2.5 py-1 rounded-lg font-medium transition bg-pink-600 text-white cursor-pointer">
           👤 ลูกค้าทั่วไป (ปลีก)
         </button>
@@ -94,9 +96,13 @@
         </button>
       </div>
 
-      <div class="flex items-center gap-2">
+      <!-- แถบแสดงระดับสมาชิกปัจจุบันสำหรับลูกค้าทั่วไป -->
+      <div id="customerTierStatusPill" class="flex items-center gap-2">
+        <span id="customerTierLabelText" class="px-2.5 py-1 rounded-lg bg-slate-800 border border-slate-700 text-pink-200 font-semibold">
+          👤 สมาชิกทั่วไป (ราคาปลีก)
+        </span>
         <span id="connectionStatusPill" class="px-2.5 py-1 rounded-lg bg-emerald-500/20 border border-emerald-400/40 text-emerald-200 font-semibold">
-          ● เชื่อมต่อระบบอัตโนมัติ
+          ● ระบบอัตโนมัติ 24 ชม.
         </span>
       </div>
     </div>
@@ -628,9 +634,13 @@
                   <input id="livePromptPayInput" type="text" value="0863807024" class="w-full px-3.5 py-2 rounded-xl border border-pink-200 bg-white font-mono-code font-bold text-slate-800" />
                 </div>
                 <div>
-                  <label class="block font-bold text-slate-700 mb-1">อีเมลแอดมินรับแจ้งเตือน</label>
+                  <label class="block font-bold text-slate-700 mb-1">อีเมลแอดมิน (มีสิทธิ์เข้าหลังบ้าน)</label>
                   <input id="liveAdminEmailInput" type="email" value="pigiria9@gmail.com" class="w-full px-3.5 py-2 rounded-xl border border-pink-200 bg-white text-slate-800" />
                 </div>
+              </div>
+              <div>
+                <label class="block font-bold text-slate-700 mb-1">รหัสผ่าน PIN เข้าสู่ระบบหลังบ้าน (Admin PIN)</label>
+                <input id="liveAdminPinInput" type="password" value="8899" placeholder="ตั้งรหัสผ่านแอดมิน 4-8 หลัก" class="w-full px-3.5 py-2 rounded-xl border border-pink-200 bg-white font-mono-code font-bold text-slate-800" />
               </div>
               <div>
                 <label class="block font-bold text-slate-700 mb-1">Netlify Function ตรวจสลิป (Slip2Go / EasySlip)</label>
@@ -794,9 +804,9 @@
               <input type="file" accept="image/*" onchange="handleRealSlipFileUpload(event)" class="hidden" />
             </label>
           </div>
-
-          <div class="space-y-1.5">
-            <div class="text-xs font-bold text-slate-700">🧪 ปุ่มจำลองผลตรวจสลิป (กรณีทดสอบ):</div>
+          <!-- ปุ่มจำลองตรวจสลิป: ซ่อนจากลูกค้าทั่วไปโดยสมบูรณ์ (แสดงเฉพาะแอดมินที่ปลดล็อก PIN แล้วเท่านั้น) -->
+          <div id="adminSlipSimulatorBox" class="hidden space-y-1.5">
+            <div class="text-xs font-bold text-slate-700">🧪 ปุ่มจำลองผลตรวจสลิป (เฉพาะแอดมินทดสอบ):</div>
             <div class="grid grid-cols-2 gap-2">
               <button type="button" onclick="simulateSlipVerify('SUCCESS')" class="py-2 px-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold cursor-pointer">✅ สลิปจริง 200 OK</button>
               <button type="button" onclick="simulateSlipVerify('DUPLICATE')" class="py-2 px-2.5 rounded-xl bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold cursor-pointer">🚫 บล็อกสลิปซ้ำ</button>
@@ -870,6 +880,26 @@
     </div>
   </div>
 
+  <!-- Admin PIN Security Modal -->
+  <div id="adminPinModal" class="hidden fixed inset-0 z-50 bg-slate-900/70 backdrop-blur-xs flex items-center justify-center p-4">
+    <div class="bg-white w-full max-w-sm rounded-3xl border border-pink-100 shadow-2xl overflow-hidden animate-fade-up">
+      <div class="px-6 py-4 bg-slate-900 text-white flex items-center justify-between">
+        <h3 class="font-bold text-sm flex items-center gap-2"><span>🔐</span> <span>ยืนยันรหัสผ่านแอดมิน (Admin PIN)</span></h3>
+        <button onclick="closeModal('adminPinModal')" class="w-8 h-8 rounded-full bg-slate-800 text-slate-300 hover:text-white flex items-center justify-center cursor-pointer"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+      <div class="p-6 space-y-4 text-xs">
+        <p class="text-slate-600">กรุณากรอกรหัส PIN เพื่อปลดล็อกสิทธิ์เข้าสู่ระบบจัดการหลังบ้านร้านค้า</p>
+        <div>
+          <label class="block font-bold text-slate-700 mb-1">รหัสผ่าน PIN</label>
+          <input id="adminPinVerifyInput" type="password" placeholder="••••" onkeydown="if(event.key==='Enter') verifyAdminPinAndEnter()" class="w-full px-3.5 py-2.5 rounded-xl border border-pink-200 text-center font-mono-code text-lg font-bold tracking-widest" />
+        </div>
+        <button onclick="verifyAdminPinAndEnter()" class="w-full py-3 rounded-xl theme-bg-primary text-white text-sm font-bold shadow-xs cursor-pointer">
+          🔓 ปลดล็อกเข้าสู่ระบบหลังบ้าน
+        </button>
+      </div>
+    </div>
+  </div>
+
   <!-- Toast Container -->
   <div id="toastContainer" class="fixed bottom-4 right-4 z-50 space-y-2 max-w-sm pointer-events-none"></div>
 
@@ -900,6 +930,7 @@
         themeKey: 'rose',
         promptpayId: '0863807024',
         adminEmail: 'pigiria9@gmail.com',
+        adminPin: '8899',
         adminCcEmail: 'support@pinkflow.store',
         adminPreorderEmailAlert: true,
         liveProductionMode: true,
@@ -928,6 +959,55 @@
 
     let state = loadState();
     let activeCheckoutState = { productId: null, qty: 1 };
+    let isAdminSessionUnlocked = false;
+
+    function isAdminAccount() {
+      const currentEmail = (state.user.email || '').trim().toLowerCase();
+      const adminEmail = (state.settings.adminEmail || 'pigiria9@gmail.com').trim().toLowerCase();
+      return Boolean(currentEmail) && currentEmail === adminEmail;
+    }
+
+    function updateSecurityVisibility() {
+      const isAdmin = isAdminAccount();
+      const adminBtn = document.getElementById('modeBtn-ADMIN');
+      const tierSimBar = document.getElementById('tierSimulatorBar');
+      const slipSimBox = document.getElementById('adminSlipSimulatorBox');
+      const tierLabel = document.getElementById('customerTierLabelText');
+      const customerStatusPill = document.getElementById('customerTierStatusPill');
+
+      if (adminBtn) adminBtn.classList.toggle('hidden', !isAdmin);
+      if (tierSimBar) tierSimBar.classList.toggle('hidden', !(isAdmin && isAdminSessionUnlocked));
+      if (customerStatusPill) customerStatusPill.classList.toggle('hidden', isAdmin && isAdminSessionUnlocked);
+      if (slipSimBox) slipSimBox.classList.toggle('hidden', !(isAdmin && isAdminSessionUnlocked));
+
+      if (tierLabel) {
+        const tierMap = {
+          MEMBER: '👤 สมาชิกทั่วไป (ราคาปลีก)',
+          AGENT: '💼 ตัวแทนจำหน่าย (ลด 15%)',
+          VIP: '👑 ตัวแทน VIP (ลด 25%)'
+        };
+        tierLabel.textContent = tierMap[state.user.tier] || tierMap.MEMBER;
+      }
+
+      if (!isAdmin && state.appMode === 'ADMIN') {
+        state.appMode = 'STORE';
+        isAdminSessionUnlocked = false;
+      }
+    }
+
+    function verifyAdminPinAndEnter() {
+      const inputPin = (document.getElementById('adminPinVerifyInput')?.value || '').trim();
+      const correctPin = String(state.settings.adminPin || '8899');
+      if (inputPin !== correctPin) {
+        showToast('⛔ รหัสผ่าน Admin PIN ไม่ถูกต้อง', 'error');
+        return;
+      }
+      isAdminSessionUnlocked = true;
+      document.getElementById('adminPinVerifyInput').value = '';
+      closeModal('adminPinModal');
+      switchAppMode('ADMIN');
+      showToast('🔓 ปลดล็อกระบบหลังบ้านแอดมินเรียบร้อยแล้ว', 'success');
+    }
 
     function loadState() {
       try {
@@ -1123,10 +1203,10 @@
       document.getElementById('headerShopTagline').textContent = s.tagline;
       document.getElementById('heroTitleText').textContent = s.heroTitle;
       document.getElementById('heroSubtitleText').textContent = s.heroSubtitle;
-      document.getElementById('headerUserEmailDisplay').textContent = state.user.email || 'เข้าสู่ระบบ';
-
-      const logoHtml = s.logoUrl
-        ? `<img src="${s.logoUrl}" alt="Logo" class="w-full h-full object-cover" />`
+      document.getElementById('headerUserEmailDisplay').textContent =
+        (state.user.email && state.user.email !== 'customer@gmail.com')
+          ? state.user.email
+          : 'เข้าสู่ระบบ / กรอกอีเมล';
         : `<i class="fa-solid ${s.logoIcon || 'fa-crown'}"></i>`;
 
       document.getElementById('headerLogoContainer').innerHTML = logoHtml;
@@ -1138,6 +1218,17 @@
     // NAVIGATION & TIER SWITCHING
     // =========================================================================
     function switchAppMode(mode) {
+      if (mode === 'ADMIN') {
+        if (!isAdminAccount()) {
+          showToast('⛔ เฉพาะอีเมลแอดมินร้านเท่านั้นที่เข้าถึงระบบหลังบ้านได้', 'error');
+          mode = 'STORE';
+        } else if (!isAdminSessionUnlocked) {
+          document.getElementById('adminPinVerifyInput').value = '';
+          document.getElementById('adminPinModal').classList.remove('hidden');
+          return;
+        }
+      }
+
       state.appMode = mode;
       const storeView = document.getElementById('storefrontView');
       const adminView = document.getElementById('adminView');
@@ -1160,6 +1251,7 @@
         btnAdmin.className = 'px-3 py-1.5 rounded-lg font-semibold transition flex items-center gap-1.5 text-slate-300 hover:text-white cursor-pointer relative';
         switchStoreTab(state.storeTab || 'CATALOG');
       }
+      updateSecurityVisibility();
       saveState();
     }
 
@@ -1298,6 +1390,11 @@
     // CHECKOUT & REAL SUPABASE ORDER API
     // =========================================================================
     function openCheckoutModal(productId) {
+      if (!state.user.email || state.user.email === 'customer@gmail.com') {
+        showToast('กรุณากรอกอีเมลของคุณก่อนสั่งซื้อสินค้าค่ะ', 'info');
+        openEmailLoginModal();
+        return;
+      }
       const p = state.products.find(x => x.id === productId);
       if (!p) return;
 
@@ -1523,6 +1620,11 @@
     // SLIP TOPUP (SUPPORTS BOTH SLIP2GO & EASYSLIP VIA NETLIFY FUNCTION)
     // =========================================================================
     function openTopupModal() {
+      if (!state.user.email || state.user.email === 'customer@gmail.com') {
+        showToast('กรุณากรอกอีเมลของคุณก่อนเติมเครดิตค่ะ', 'info');
+        openEmailLoginModal();
+        return;
+      }
       updateDynamicPromptPayQr();
       document.getElementById('topupModal').classList.remove('hidden');
     }
@@ -1906,6 +2008,8 @@
       document.getElementById('liveOrderEndpointInput').value = state.settings.liveOrderEndpoint || '/.netlify/functions/place-order';
       document.getElementById('livePromptPayInput').value = state.settings.promptpayId || '0863807024';
       document.getElementById('liveAdminEmailInput').value = state.settings.adminEmail || 'pigiria9@gmail.com';
+      const pinEl = document.getElementById('liveAdminPinInput');
+      if (pinEl) pinEl.value = state.settings.adminPin || '8899';
     }
 
     function toggleAdminEmailAlertSetting() {
@@ -2060,10 +2164,12 @@
       state.settings.liveOrderEndpoint = document.getElementById('liveOrderEndpointInput').value.trim() || '/.netlify/functions/place-order';
       state.settings.promptpayId = document.getElementById('livePromptPayInput').value.trim() || state.settings.promptpayId;
       state.settings.adminEmail = document.getElementById('liveAdminEmailInput').value.trim() || state.settings.adminEmail;
+      const newPin = (document.getElementById('liveAdminPinInput')?.value || '').trim();
+      if (newPin) state.settings.adminPin = newPin;
       saveState();
       renderAll();
       updateDynamicPromptPayQr();
-      showToast('💾 บันทึกเลขพร้อมเพย์และการตั้งค่าเรียบร้อย!', 'success');
+      showToast('💾 บันทึกเลขพร้อมเพย์ รหัส PIN และการตั้งค่าเรียบร้อย!', 'success');
     }
 
     function closeModal(id) { document.getElementById(id)?.classList.add('hidden'); }
@@ -2087,6 +2193,7 @@
     }
 
     function renderAll() {
+      updateSecurityVisibility();
       renderBranding();
       document.getElementById('headerBalanceDisplay').textContent = `฿${state.user.balance.toFixed(2)}`;
       document.getElementById('headerPointsDisplay').textContent = `${state.user.points} แต้ม`;
@@ -2100,7 +2207,8 @@
 
     window.addEventListener('DOMContentLoaded', () => {
       setUserTier(state.user.tier || 'MEMBER');
-      switchAppMode(state.appMode || 'STORE');
+      if (!isAdminAccount()) state.appMode = 'STORE';
+      switchAppMode(state.appMode === 'ADMIN' ? 'STORE' : (state.appMode || 'STORE'));
       renderAll();
       submitEmailLoginSync(true);
     });
