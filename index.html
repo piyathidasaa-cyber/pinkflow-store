@@ -396,18 +396,18 @@
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           <div class="bg-white p-5 rounded-3xl border border-pink-100 shadow-2xs">
             <div class="text-xs text-slate-500">ยอดขายรวมทั้งหมด</div>
-            <div class="text-2xl font-bold text-slate-900 mt-1">฿12,480.00</div>
-            <div class="text-xs text-emerald-600 font-semibold mt-1">↑ +18.5% จากสัปดาห์ที่แล้ว</div>
+            <div id="adminStatTotalSales" class="text-2xl font-bold text-slate-900 mt-1">฿0.00</div>
+            <div class="text-xs text-slate-400 font-medium mt-1">คำนวณจากออเดอร์จริงในระบบ</div>
           </div>
           <div class="bg-white p-5 rounded-3xl border border-pink-100 shadow-2xs">
             <div class="text-xs text-slate-500">กำไรสุทธิหลังหักต้นทุน</div>
-            <div class="text-2xl font-bold theme-text-primary mt-1">฿5,840.00</div>
-            <div class="text-xs text-slate-500 mt-1">อัตรากำไรเฉลี่ย ~46.8%</div>
+            <div id="adminStatTotalProfit" class="text-2xl font-bold theme-text-primary mt-1">฿0.00</div>
+            <div class="text-xs text-slate-400 mt-1">อัปเดตอัตโนมัติเมื่อมียอดขาย</div>
           </div>
           <div class="bg-white p-5 rounded-3xl border border-pink-100 shadow-2xs">
             <div class="text-xs text-slate-500">คำสั่งซื้อทั้งหมด</div>
-            <div class="text-2xl font-bold text-slate-900 mt-1">142 ออเดอร์</div>
-            <div class="text-xs text-pink-600 font-semibold mt-1">ส่งอัตโนมัติ 94% / พรีออเดอร์ 6%</div>
+            <div id="adminStatTotalOrders" class="text-2xl font-bold text-slate-900 mt-1">0 ออเดอร์</div>
+            <div class="text-xs text-pink-600 font-semibold mt-1">พร้อมส่งอัตโนมัติ & พรีออเดอร์</div>
           </div>
           <div class="bg-white p-5 rounded-3xl border border-pink-100 shadow-2xs">
             <div class="text-xs text-slate-500">พรีออเดอร์รอจัดส่ง</div>
@@ -417,7 +417,12 @@
         </div>
 
         <div class="bg-white p-6 rounded-3xl border border-pink-100 shadow-2xs space-y-4">
-          <h3 class="text-base font-bold text-slate-900">⚠️ แจ้งเตือนสินค้าสต็อกใกล้หมด (เติมรหัสได้ทันที)</h3>
+          <div class="flex flex-wrap items-center justify-between gap-2">
+            <h3 class="text-base font-bold text-slate-900">⚠️ แจ้งเตือนสินค้าสต็อกใกล้หมด (เติมรหัสได้ทันที)</h3>
+            <button onclick="openResetConfirmModal()" class="px-3.5 py-2 rounded-xl bg-rose-50 hover:bg-rose-100 border border-rose-200 text-rose-600 text-xs font-bold transition cursor-pointer">
+              🗑️ ล้างข้อมูลในร้านค้าทั้งหมด
+            </button>
+          </div>
           <div id="adminLowStockList" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3"></div>
         </div>
       </div>
@@ -897,11 +902,28 @@
     </div>
   </div>
 
+  <!-- Reset All Data Confirm Modal -->
+  <div id="resetConfirmModal" class="hidden fixed inset-0 z-50 bg-slate-900/70 backdrop-blur-xs flex items-center justify-center p-4">
+    <div class="bg-white w-full max-w-sm rounded-3xl border border-rose-100 shadow-2xl overflow-hidden animate-fade-up">
+      <div class="px-6 py-4 bg-rose-600 text-white flex items-center justify-between">
+        <h3 class="font-bold text-sm flex items-center gap-2"><span>🗑️</span> <span>ยืนยันการลบข้อมูลทั้งหมด</span></h3>
+        <button onclick="closeModal('resetConfirmModal')" class="w-8 h-8 rounded-full bg-rose-700 text-rose-100 hover:text-white flex items-center justify-center cursor-pointer"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+      <div class="p-6 space-y-4 text-xs">
+        <p class="text-slate-600 leading-relaxed">ต้องการลบรายการสินค้า สต็อกรหัส โค้ดส่วนลด ประวัติออเดอร์ และประวัติตรวจสลิปในหน้าเว็บนี้ทั้งหมดใช่หรือไม่?</p>
+        <div class="flex gap-2">
+          <button onclick="closeModal('resetConfirmModal')" class="flex-1 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold cursor-pointer">ยกเลิก</button>
+          <button onclick="executeClearAllStoreData()" class="flex-1 py-2.5 rounded-xl bg-rose-600 hover:bg-rose-700 text-white font-bold cursor-pointer">ลบข้อมูลทั้งหมด</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <!-- Toast Container -->
   <div id="toastContainer" class="fixed bottom-4 right-4 z-50 space-y-2 max-w-sm pointer-events-none"></div>
 
   <script>
-    const STORAGE_KEY = 'pinkflow_store_prod_v7';
+    const STORAGE_KEY = 'pinkflow_store_clean_v8';
 
     const DEFAULT_STATE = {
       appMode: 'STORE',
@@ -934,23 +956,11 @@
         liveSlipEndpoint: '/.netlify/functions/verify-slip',
         liveOrderEndpoint: '/.netlify/functions/place-order'
       },
-      products: [
-        { id: 'p1', name: 'Netflix Premium 4K (30 วัน)', category: 'ดูหนัง & ซีรีส์', mode: 'INSTANT', price: 99, cost: 45, image: 'https://placehold.co/400x240/ffe4e6/be123c?text=Netflix+4K+Ultra+HD', codes: ['nf_vip01@pinkflow.store : Pass8899 (จอ 1)', 'nf_vip02@pinkflow.store : Pass7744 (จอ 2)'] },
-        { id: 'p2', name: 'YouTube Premium + Music (30 วัน)', category: 'ดูหนัง & ซีรีส์', mode: 'INSTANT', price: 49, cost: 20, image: 'https://placehold.co/400x240/fce7f3/db2777?text=YouTube+Premium', codes: ['https://youtube.com/premium/invite?code=PK881', 'https://youtube.com/premium/invite?code=PK882'] },
-        { id: 'p3', name: 'ChatGPT Plus GPT-4o (ส่วนตัว 30 วัน)', category: 'AI อัจฉริยะ', mode: 'PREORDER', eta: 'จัดส่งทางอีเมลภายใน 15-30 นาที', price: 259, cost: 150, image: 'https://placehold.co/400x240/fae8ff/a21caf?text=ChatGPT+Plus+GPT-4o', codes: [] },
-        { id: 'p4', name: 'Canva Pro Team (ตลอดชีพ / 1 ปี)', category: 'กราฟิก & ตัดต่อ', mode: 'INSTANT', price: 59, cost: 15, image: 'https://placehold.co/400x240/fdf2f8/ec4899?text=Canva+Pro+Team', codes: ['https://www.canva.com/brand/join?token=PF2026A'] },
-        { id: 'p5', name: 'Midjourney Pro Plan (30 วัน)', category: 'AI อัจฉริยะ', mode: 'PREORDER', eta: 'จัดส่งทางอีเมลภายใน 30-60 นาที', price: 290, cost: 180, image: 'https://placehold.co/400x240/f3e8ff/7e22ce?text=Midjourney+Pro+AI', codes: [] },
-        { id: 'p6', name: 'Disney+ Hotstar (30 วัน)', category: 'ดูหนัง & ซีรีส์', mode: 'INSTANT', price: 69, cost: 30, image: 'https://placehold.co/400x240/e0f2fe/0369a1?text=Disney%2B+Hotstar', codes: ['0891112233 (OTP ผ่านเว็บอัตโนมัติ)'] },
-        { id: 'p7', name: 'CapCut Pro (30 วัน ครบทุกฟีเจอร์)', category: 'กราฟิก & ตัดต่อ', mode: 'INSTANT', price: 79, cost: 35, image: 'https://placehold.co/400x240/ffe4e6/e11d48?text=CapCut+Pro+Editor', codes: ['capcut_pro01@pinkflow.store : Cc998877'] },
-        { id: 'p8', name: 'Spotify Premium Individual (30 วัน)', category: 'ฟังเพลง', mode: 'INSTANT', price: 45, cost: 18, image: 'https://placehold.co/400x240/dcfce7/15803d?text=Spotify+Premium', codes: ['https://spotify.com/th/invite/PF901'] }
-      ],
+      products: [],
       orders: [],
       adminEmailAlerts: [],
       slipLogs: [],
-      coupons: [
-        { code: 'WELCOME20', discount: 20, minSpend: 50, quota: 45 },
-        { code: 'PINK10', discount: 10, minSpend: 30, quota: 80 }
-      ],
+      coupons: [],
       pointsHistory: []
     };
 
@@ -1008,7 +1018,10 @@
 
     function loadState() {
       try {
-        const saved = localStorage.getItem(STORAGE_KEY) || localStorage.getItem('pinkflow_store_prod_v6');
+        ['pinkflow_store_prod_v7', 'pinkflow_store_prod_v6', 'pinkflow_store_prod_v5'].forEach(oldKey => {
+          localStorage.removeItem(oldKey);
+        });
+        const saved = localStorage.getItem(STORAGE_KEY);
         if (saved) {
           const parsed = JSON.parse(saved);
           const merged = Object.assign({}, DEFAULT_STATE, parsed);
@@ -1023,6 +1036,21 @@
         }
       } catch (e) {}
       return JSON.parse(JSON.stringify(DEFAULT_STATE));
+    }
+
+    function openResetConfirmModal() {
+      document.getElementById('resetConfirmModal')?.classList.remove('hidden');
+    }
+
+    function executeClearAllStoreData() {
+      const currentAdminEmail = state.user.email;
+      localStorage.removeItem(STORAGE_KEY);
+      state = JSON.parse(JSON.stringify(DEFAULT_STATE));
+      state.user.email = currentAdminEmail;
+      saveState();
+      closeModal('resetConfirmModal');
+      renderAll();
+      showToast('🗑️ ล้างข้อมูลทั้งหมดในร้านค้าเรียบร้อยแล้ว (เริ่มต้นใหม่ 0 รายการ)', 'success');
     }
 
     function saveState() {
@@ -1341,6 +1369,10 @@
       });
 
       const grid = document.getElementById('productsGrid');
+      if (state.products.length === 0) {
+        grid.innerHTML = `<div class="col-span-full text-center py-12 bg-white rounded-3xl border border-pink-100 text-slate-500 text-sm">ยังไม่มีรายการสินค้าในร้านค้า (เริ่มต้นระบบใหม่เรียบร้อยแล้ว)</div>`;
+        return;
+      }
       if (filtered.length === 0) {
         grid.innerHTML = `<div class="col-span-full text-center py-12 bg-white rounded-3xl border border-pink-100 text-slate-500 text-sm">ไม่พบสินค้าที่ตรงกับเงื่อนไขการค้นหา</div>`;
         return;
@@ -1929,13 +1961,29 @@
 
     function renderAdminPanels() {
       const pendingPreorders = state.orders.filter(o => o.status === 'PENDING_PREORDER').length;
+      const totalSales = state.orders.reduce((sum, o) => sum + Number(o.totalPaid || 0), 0);
+      const totalProfit = state.orders.reduce((sum, o) => {
+        const prod = state.products.find(p => p.id === o.productId);
+        const unitCost = prod ? Number(prod.cost || 0) : 0;
+        return sum + Math.max(0, Number(o.totalPaid || 0) - unitCost * Number(o.qty || 1));
+      }, 0);
+
+      const salesEl = document.getElementById('adminStatTotalSales');
+      const profitEl = document.getElementById('adminStatTotalProfit');
+      const ordersCountEl = document.getElementById('adminStatTotalOrders');
+      if (salesEl) salesEl.textContent = `฿${totalSales.toFixed(2)}`;
+      if (profitEl) profitEl.textContent = `฿${totalProfit.toFixed(2)}`;
+      if (ordersCountEl) ordersCountEl.textContent = `${state.orders.length} ออเดอร์`;
+
       const mainBadge = document.getElementById('adminUnreadBadge');
       mainBadge.textContent = String(pendingPreorders);
       mainBadge.classList.toggle('hidden', pendingPreorders === 0);
       document.getElementById('adminPreorderCountBadge').textContent = String(pendingPreorders);
       document.getElementById('adminStatPendingPre').textContent = `${pendingPreorders} รายการ`;
 
-      document.getElementById('adminLowStockList').innerHTML = state.products.filter(p => p.mode === 'INSTANT').map(p => `
+      const instantProducts = state.products.filter(p => p.mode === 'INSTANT');
+      document.getElementById('adminLowStockList').innerHTML = instantProducts.length > 0
+        ? instantProducts.map(p => `
         <div class="p-3.5 rounded-2xl border border-slate-200 flex items-center justify-between">
           <div>
             <div class="font-bold text-xs">${p.name}</div>
@@ -1943,7 +1991,8 @@
           </div>
           <button onclick="switchAdminTab('STOCKS'); document.getElementById('adminStockProductSelect').value='${p.id}'; renderAdminStockCodes();" class="px-3 py-1.5 rounded-xl theme-bg-primary text-white text-xs font-bold cursor-pointer">+ เติมสต็อก</button>
         </div>
-      `).join('');
+      `).join('')
+        : `<div class="col-span-full text-xs text-slate-400">ยังไม่มีสินค้าในระบบ</div>`;
 
       document.getElementById('adminEmailInboxList').innerHTML = state.adminEmailAlerts.map(a => `
         <div class="p-3 rounded-2xl border border-pink-200 bg-pink-50/40 space-y-1">
@@ -1969,9 +2018,8 @@
             ` : `<div class="text-xs font-mono-code text-emerald-800">รหัส: ${o.deliveredData.join(', ')}</div>`}
           </div>
         `;
-      }).join('') || `<div class="text-xs text-slate-400">ยังไม่มีรายการพรีออเดอร์</div>`;
-
-      document.getElementById('adminProductsTable').innerHTML = state.products.map(p => `
+      document.getElementById('adminProductsTable').innerHTML = state.products.length > 0
+        ? state.products.map(p => `
         <div class="p-4 rounded-2xl border border-pink-100 flex flex-col justify-between gap-3">
           <div class="flex items-center gap-3">
             <img src="${p.image}" class="w-14 h-14 rounded-xl object-cover border border-pink-200" />
@@ -1982,7 +2030,8 @@
             <button onclick="deleteProductById('${p.id}')" class="px-3 py-1.5 rounded-xl bg-rose-50 text-rose-600 text-xs font-bold cursor-pointer">ลบ</button>
           </div>
         </div>
-      `).join('');
+      `).join('')
+        : `<div class="col-span-full text-center py-8 text-xs text-slate-400">ยังไม่มีสินค้าในระบบ กดปุ่ม "+ เพิ่มสินค้าใหม่" ด้านบนเพื่อเริ่มต้น</div>`;
 
       const stockSel = document.getElementById('adminStockProductSelect');
       const curVal = stockSel.value;
