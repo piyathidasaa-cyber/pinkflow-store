@@ -124,16 +124,11 @@
         </div>
       </div>
 
-      <!-- Account Email Sync + Points + Wallet -->
+      <!-- Account Email Sync + Wallet -->
       <div class="flex items-center gap-2 sm:gap-3 flex-wrap">
         <button onclick="openEmailLoginModal()" class="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-slate-100 hover:bg-pink-50 border border-slate-200 text-slate-700 text-xs font-semibold transition cursor-pointer" title="คลิกเพื่อเข้าสู่ระบบหรือเปลี่ยนอีเมลบัญชี">
           <i class="fa-solid fa-user-check theme-text-primary"></i>
           <span id="headerUserEmailDisplay" class="max-w-[160px] truncate">เข้าสู่ระบบ / กรอกอีเมล</span>
-        </button>
-
-        <button onclick="switchAppMode('STORE'); switchStoreTab('REWARDS')" class="hidden sm:flex items-center gap-1.5 px-3 py-2 rounded-xl bg-amber-50 border border-amber-200 text-amber-700 hover:bg-amber-100 transition text-xs font-bold cursor-pointer">
-          <span>⭐</span>
-          <span id="headerPointsDisplay">0 แต้ม</span>
         </button>
 
         <div class="flex items-center gap-2 bg-pink-50/80 border border-pink-200 px-3 py-1.5 rounded-2xl">
@@ -159,7 +154,7 @@
         <span id="expiringAlertPill" class="hidden px-1.5 py-0.5 text-[10px] bg-amber-500 text-white rounded-full font-bold">ใกล้หมดอายุ 1</span>
       </button>
       <button id="storeTabBtn-REWARDS" onclick="switchStoreTab('REWARDS')" class="px-3.5 py-2 rounded-xl text-xs sm:text-sm font-semibold text-slate-600 hover:bg-pink-50 transition whitespace-nowrap cursor-pointer">
-        🎁 โปรโมชั่น & แลกแต้มเงินสด
+        🎟️ โค้ดส่วนลด & ระดับสมาชิก
       </button>
       <button id="storeTabBtn-API" onclick="switchStoreTab('API')" class="px-3.5 py-2 rounded-xl text-xs sm:text-sm font-semibold text-slate-600 hover:bg-pink-50 transition whitespace-nowrap cursor-pointer">
         🔌 API ตัวแทนจำหน่าย
@@ -183,14 +178,14 @@
               แอพพรีเมี่ยมแท้ ราคาสุดคุ้ม กดปุ๊บรับรหัสปั๊บ!
             </h2>
             <p id="heroSubtitleText" class="text-sm sm:text-base text-pink-50">
-              รองรับทั้งสินค้าพร้อมส่งอัตโนมัติและสินค้าพรีออเดอร์ แจ้งเตือนสถานะผ่านอีเมลทันที พร้อมระบบเรทราคาตัวแทนจำหน่าย
+              รองรับทั้งสินค้าพร้อมส่งอัตโนมัติและสินค้าพรีออเดอร์ จัดส่งพร้อมคู่มือการใช้งานผ่านอีเมลทันที
             </p>
             <div class="pt-2 flex flex-wrap items-center gap-2.5">
               <button onclick="openTopupModal()" class="px-4 py-2.5 rounded-xl bg-white text-pink-600 hover:bg-pink-50 font-bold text-xs sm:text-sm shadow-sm transition cursor-pointer">
                 💳 เติมเครดิตพร้อมเพย์
               </button>
               <button onclick="switchStoreTab('REWARDS')" class="px-4 py-2.5 rounded-xl bg-pink-700/40 hover:bg-pink-700/60 border border-white/30 text-white font-semibold text-xs sm:text-sm transition cursor-pointer">
-                🎟️ เก็บโค้ดส่วนลด & แลกแต้ม
+                🎟️ เก็บโค้ดส่วนลดประจำเดือน
               </button>
             </div>
           </div>
@@ -219,14 +214,14 @@
         <div id="productsGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5"></div>
       </div>
 
-      <!-- STORE TAB 2: ORDERS & 1-CLICK RENEWAL -->
+      <!-- STORE TAB 2: ORDERS & DELIVERY FORM RECEIPT -->
       <div id="storePanel-ORDERS" class="hidden space-y-6 animate-fade-up">
         <div id="nearExpiryContainer"></div>
         <div class="bg-white p-5 sm:p-6 rounded-3xl border border-pink-100 shadow-2xs space-y-4">
           <div class="flex flex-wrap items-center justify-between gap-2 border-b border-pink-100 pb-4">
             <div>
               <h2 class="text-lg font-bold text-slate-900">📦 ประวัติการสั่งซื้อ & กล่องอีเมลรับรหัสสินค้า</h2>
-              <p class="text-xs text-slate-500">ตรวจสอบรหัสใช้งาน สถานะพรีออเดอร์ ต่ออายุใน 1 คลิก และเปิดดูอีเมลแจ้งเตือนย้อนหลัง</p>
+              <p class="text-xs text-slate-500">ตรวจสอบรหัสใช้งาน ฟอร์มคู่มือการจัดส่ง และเปิดอ่านอีเมลแจ้งเตือนย้อนหลัง</p>
             </div>
             <span id="totalOrdersCountBadge" class="px-3 py-1 rounded-full text-xs font-bold theme-bg-light theme-text-primary">0 รายการ</span>
           </div>
@@ -234,91 +229,35 @@
         </div>
       </div>
 
-      <!-- STORE TAB 3: REWARDS & COUPONS -->
+      <!-- STORE TAB 3: COUPONS & MEMBER TIERS -->
       <div id="storePanel-REWARDS" class="hidden space-y-6 animate-fade-up">
-        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
-          <div class="lg:col-span-7 bg-white p-6 rounded-3xl border border-pink-100 shadow-2xs space-y-5">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div class="bg-white p-6 rounded-3xl border border-pink-100 shadow-2xs space-y-4">
             <div class="flex items-center justify-between">
               <div>
-                <span class="px-2.5 py-1 rounded-full text-xs font-bold bg-amber-100 text-amber-800">Loyalty Rewards</span>
-                <h2 class="text-lg font-bold text-slate-900 mt-1">💸 ระบบสะสมแต้มแลกเงินสด & เครดิต</h2>
-                <p class="text-xs text-slate-500">ทุกยอดสั่งซื้อ ฿10 รับ 1 แต้ม (อัตราแลก: 10 แต้ม = ฿2.00)</p>
+                <span class="px-2.5 py-1 rounded-full text-xs font-bold theme-bg-light theme-text-primary">Member Privileges</span>
+                <h3 class="text-base font-bold text-slate-900 mt-1.5">👑 ระดับสมาชิก & อัปเกรดอัตโนมัติ</h3>
               </div>
-              <div class="text-right bg-amber-50 border border-amber-200 px-4 py-2.5 rounded-2xl">
-                <div class="text-[11px] text-amber-700 font-medium">แต้มสะสมของคุณ</div>
-                <div id="rewardsPointsBalance" class="text-xl font-bold text-amber-600">0 แต้ม</div>
-                <div id="rewardsCashEquivalent" class="text-[11px] text-slate-500">มูลค่า ฿0.00</div>
-              </div>
+              <span id="currentTierBadgeCard" class="px-3 py-1 rounded-full text-xs font-bold theme-bg-light theme-text-primary">MEMBER</span>
             </div>
-
-            <div class="p-4 rounded-2xl bg-pink-50/50 border border-pink-100 space-y-4">
-              <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                <div>
-                  <label class="block text-xs font-bold text-slate-700 mb-1">จำนวนแต้มที่ต้องการแลก (ขั้นต่ำ 10 แต้ม)</label>
-                  <input id="redeemPointsInput" type="number" min="10" step="10" value="50" oninput="updateRedeemPreview()" class="w-full px-3.5 py-2.5 rounded-xl border border-pink-200 bg-white font-bold text-slate-900 text-sm" />
-                </div>
-                <div>
-                  <label class="block text-xs font-bold text-slate-700 mb-1">ช่องทางการรับเงิน</label>
-                  <select id="redeemMethodSelect" onchange="updateRedeemPreview()" class="w-full px-3.5 py-2.5 rounded-xl border border-pink-200 bg-white font-semibold text-slate-800 text-sm">
-                    <option value="WALLET">💳 เติมเข้ากระเป๋าเครดิต (+โบนัส 10%)</option>
-                    <option value="PROMPTPAY">🏦 โอนเข้าบัญชีพร้อมเพย์เงินสด</option>
-                  </select>
-                </div>
+            <p class="text-xs text-slate-500 leading-relaxed">สะสมยอดสั่งซื้อครบ <strong>฿500</strong> อัปเกรดเป็น <strong>Agent (ลด 15%)</strong> และครบ <strong>฿1,500</strong> อัปเกรดเป็น <strong>VIP (ลด 25%)</strong> อัตโนมัติทันที</p>
+            <div class="p-4 rounded-2xl bg-pink-50/50 border border-pink-100 space-y-2">
+              <div class="flex justify-between text-xs font-semibold">
+                <span>ยอดซื้อสะสมของคุณ: <span id="totalSpendDisplay" class="theme-text-primary font-bold">฿0.00</span></span>
+                <span id="nextTierTargetText" class="text-slate-500">อีก ฿500 ถึง Agent</span>
               </div>
-
-              <div id="redeemPromptPayBox" class="hidden">
-                <label class="block text-xs font-bold text-slate-700 mb-1">เบอร์พร้อมเพย์สำหรับรับโอนเงินสด</label>
-                <input id="redeemPromptPayInput" type="text" placeholder="08X-XXX-XXXX" class="w-full px-3.5 py-2 rounded-xl border border-pink-200 bg-white text-sm font-mono-code" />
+              <div class="w-full h-2.5 bg-pink-100 rounded-full overflow-hidden">
+                <div id="tierProgressBar" class="h-full theme-bg-primary rounded-full transition-all duration-500" style="width: 0%"></div>
               </div>
-
-              <div class="flex flex-wrap items-center justify-between gap-3 pt-2 border-t border-pink-200/60">
-                <div class="text-xs text-slate-600">
-                  ยอดเงินที่จะได้รับ: <span id="redeemReceiveAmountText" class="text-base font-bold text-emerald-600">฿11.00</span>
-                </div>
-                <button onclick="redeemPointsAction()" class="px-5 py-2.5 rounded-xl theme-bg-primary text-white text-xs sm:text-sm font-bold shadow-xs transition cursor-pointer">
-                  ✨ ยืนยันแลกแต้มเป็นเงินทันที
-                </button>
-              </div>
-            </div>
-
-            <div>
-              <h3 class="text-xs font-bold text-slate-700 mb-2">ประวัติการรับและแลกแต้มล่าสุด</h3>
-              <div id="pointsHistoryList" class="space-y-2 max-h-48 overflow-y-auto pr-1"></div>
             </div>
           </div>
 
-          <div class="lg:col-span-5 space-y-6">
-            <div class="bg-white p-6 rounded-3xl border border-pink-100 shadow-2xs space-y-3">
-              <div class="flex items-center justify-between">
-                <h3 class="text-sm font-bold text-slate-900">👑 ระดับสมาชิก & อัปเกรดอัตโนมัติ</h3>
-                <span id="currentTierBadgeCard" class="px-2.5 py-0.5 rounded-full text-xs font-bold theme-bg-light theme-text-primary">MEMBER</span>
-              </div>
-              <p class="text-xs text-slate-500">สะสมยอดสั่งซื้อครบ ฿500 อัปเกรดเป็น <strong>Agent (-15%)</strong> และครบ ฿1,500 เป็น <strong>VIP (-25%)</strong> อัตโนมัติ</p>
-              <div class="space-y-1.5">
-                <div class="flex justify-between text-xs font-semibold">
-                  <span>ยอดซื้อสะสม: <span id="totalSpendDisplay" class="theme-text-primary">฿0.00</span></span>
-                  <span id="nextTierTargetText" class="text-slate-500">อีก ฿500 ถึง Agent</span>
-                </div>
-                <div class="w-full h-2.5 bg-pink-100 rounded-full overflow-hidden">
-                  <div id="tierProgressBar" class="h-full theme-bg-primary rounded-full transition-all duration-500" style="width: 0%"></div>
-                </div>
-              </div>
+          <div class="bg-white p-6 rounded-3xl border border-pink-100 shadow-2xs space-y-4">
+            <div>
+              <span class="px-2.5 py-1 rounded-full text-xs font-bold bg-amber-100 text-amber-800">Promo Codes</span>
+              <h3 class="text-base font-bold text-slate-900 mt-1.5">🎟️ คลังโค้ดส่วนลดประจำเดือน</h3>
             </div>
-
-            <div class="bg-white p-6 rounded-3xl border border-pink-100 shadow-2xs space-y-3">
-              <h3 class="text-sm font-bold text-slate-900">🎟️ คลังโค้ดส่วนลดประจำเดือน</h3>
-              <div id="storeCouponsList" class="space-y-2.5"></div>
-            </div>
-
-            <div class="bg-gradient-to-br from-pink-50 to-rose-50 p-5 rounded-3xl border border-pink-200 space-y-3">
-              <h3 class="text-sm font-bold text-pink-900">🤝 ชวนเพื่อนช้อป รับค่าคอมมิชชัน 10%</h3>
-              <div class="flex items-center gap-2">
-                <input id="affiliateLinkInput" type="text" readonly value="https://pinkflow-store.netlify.app/?ref=PINK888" class="flex-1 px-3 py-2 rounded-xl bg-white border border-pink-200 text-xs font-mono-code text-slate-700" />
-                <button onclick="copyTextValue('https://pinkflow-store.netlify.app/?ref=PINK888', 'คัดลอกลิงก์แนะนำเพื่อนแล้ว!')" class="px-3 py-2 rounded-xl theme-bg-primary text-white text-xs font-bold cursor-pointer">
-                  คัดลอก
-                </button>
-              </div>
-            </div>
+            <div id="storeCouponsList" class="space-y-2.5"></div>
           </div>
         </div>
       </div>
@@ -371,7 +310,7 @@
             <span id="adminPreorderCountBadge" class="px-1.5 py-0.5 bg-rose-500 text-white text-[10px] rounded-full font-bold">0</span>
           </button>
           <button id="adminTabBtn-PRODUCTS" onclick="switchAdminTab('PRODUCTS')" class="admin-tab-btn px-3 py-2 rounded-xl text-xs font-semibold text-slate-600 hover:bg-pink-50 transition cursor-pointer">
-            📦 จัดการสินค้า & รูปภาพ
+            📦 จัดการสินค้า & ฟอร์มจัดส่ง
           </button>
           <button id="adminTabBtn-STOCKS" onclick="switchAdminTab('STOCKS')" class="admin-tab-btn px-3 py-2 rounded-xl text-xs font-semibold text-slate-600 hover:bg-pink-50 transition cursor-pointer">
             🔑 คลังสต็อกรหัส
@@ -391,7 +330,7 @@
         </div>
       </div>
 
-      <!-- ADMIN OVERVIEW (ทุกตัวเลขเริ่มที่ 0 จริง 100%) -->
+      <!-- ADMIN OVERVIEW -->
       <div id="adminPanel-OVERVIEW" class="space-y-6">
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           <div class="bg-white p-5 rounded-3xl border border-pink-100 shadow-2xs">
@@ -467,7 +406,10 @@
           </div>
 
           <div class="lg:col-span-7 bg-white p-5 rounded-3xl border border-pink-100 shadow-2xs space-y-3">
-            <h3 class="text-sm font-bold text-slate-900">⏳ รายการพรีออเดอร์ & ส่งรหัสเข้าอีเมลลูกค้า</h3>
+            <div>
+              <h3 class="text-sm font-bold text-slate-900">⏳ รายการพรีออเดอร์ & ส่งรหัสพร้อมฟอร์มเข้าอีเมลลูกค้า</h3>
+              <p class="text-[11px] text-slate-500">ระบบจะดึงฟอร์มจัดส่งที่บันทึกไว้ในสินค้านั้นมาส่งคู่กับรหัสให้อัตโนมัติ (สามารถแก้ไขฟอร์มเฉพาะออเดอร์ก่อนส่งได้)</p>
+            </div>
             <div id="adminPreordersQueueList" class="space-y-3"></div>
           </div>
         </div>
@@ -478,8 +420,8 @@
         <div class="bg-white p-6 rounded-3xl border border-pink-100 shadow-2xs space-y-4">
           <div class="flex flex-wrap items-center justify-between gap-3">
             <div>
-              <h3 class="text-base font-bold text-slate-900">📦 จัดการรายการสินค้า & รูปภาพปกสินค้า</h3>
-              <p class="text-xs text-slate-500">เพิ่มสินค้าใหม่ อัปโหลดรูปภาพปกสินค้า หรือสลับโหมดพร้อมส่ง / พรีออเดอร์</p>
+              <h3 class="text-base font-bold text-slate-900">📦 จัดการรายการสินค้า รูปภาพปก & ฟอร์มจัดส่งประจำสินค้า</h3>
+              <p class="text-xs text-slate-500">ตั้งค่าฟอร์มข้อความจัดส่ง (วิธีใช้งาน / เงื่อนไขประกัน / ลิงก์ติดต่อ) แยกแต่ละสินค้าเพื่อส่งพร้อมรหัสอัตโนมัติ</p>
             </div>
             <button onclick="openProductEditorModal()" class="px-4 py-2.5 rounded-xl theme-bg-primary text-white text-xs sm:text-sm font-bold shadow-xs cursor-pointer">
               + เพิ่มสินค้าใหม่
@@ -681,7 +623,7 @@
         <button onclick="closeModal('emailLoginModal')" class="w-8 h-8 rounded-full bg-white text-slate-500 hover:text-pink-600 flex items-center justify-center cursor-pointer"><i class="fa-solid fa-xmark"></i></button>
       </div>
       <div class="p-6 space-y-4 text-xs">
-        <p class="text-slate-600">กรอกอีเมลของคุณเพื่อดึงยอดเครดิต แต้มสะสม และประวัติคำสั่งซื้อจากฐานข้อมูล Supabase (หากยังไม่เคยใช้งาน ระบบจะสร้างบัญชีให้อัตโนมัติ)</p>
+        <p class="text-slate-600">กรอกอีเมลของคุณเพื่อดึงยอดเครดิต และประวัติคำสั่งซื้อจากฐานข้อมูล Supabase (หากยังไม่เคยใช้งาน ระบบจะสร้างบัญชีให้อัตโนมัติ)</p>
         <div>
           <label class="block font-bold text-slate-700 mb-1">อีเมลของคุณ</label>
           <input id="loginEmailInput" type="email" placeholder="you@email.com" onkeydown="if(event.key==='Enter') submitEmailLoginSync()" class="w-full px-3.5 py-2.5 rounded-xl border border-pink-200 text-sm font-semibold" />
@@ -723,7 +665,7 @@
         </div>
 
         <div id="checkoutPreorderFields" class="hidden p-4 rounded-2xl bg-amber-50/80 border border-amber-200 space-y-3">
-          <div class="text-xs font-bold text-amber-800">⏳ สินค้าพรีออเดอร์ (แจ้งเตือนเข้าเมลแอดมิน & ส่งรหัสเข้าเมลลูกค้าอัตโนมัติ)</div>
+          <div class="text-xs font-bold text-amber-800">⏳ สินค้าพรีออเดอร์ (แจ้งเตือนเข้าเมลแอดมิน & ส่งรหัสพร้อมฟอร์มเข้าเมลลูกค้าอัตโนมัติ)</div>
           <div>
             <label class="block text-xs font-bold text-slate-700 mb-1">อีเมลของคุณสำหรับรับรหัสสินค้า *</label>
             <input id="checkoutCustomerEmailInput" type="email" placeholder="you@email.com" class="w-full px-3.5 py-2 rounded-xl border border-amber-300 bg-white text-sm" />
@@ -741,17 +683,9 @@
           </select>
         </div>
 
-        <label class="flex items-center justify-between p-3 rounded-xl bg-amber-50/60 border border-amber-200 cursor-pointer">
-          <div class="flex items-center gap-2">
-            <input id="checkoutUsePointsCheckbox" type="checkbox" onchange="recalculateCheckoutSummary()" class="accent-pink-600 w-4 h-4" />
-            <span class="text-xs font-bold text-slate-800">ใช้แต้มสะสมแลกส่วนลดเงินสด</span>
-          </div>
-          <span id="checkoutAvailablePointsDiscount" class="text-xs font-bold text-amber-700">มี 0 แต้ม</span>
-        </label>
-
         <div class="p-4 rounded-2xl bg-slate-50 border border-slate-200 space-y-1.5 text-xs">
           <div class="flex justify-between text-slate-600"><span>ยอดรวมสินค้า</span><span id="checkoutSubtotalText">฿0.00</span></div>
-          <div class="flex justify-between text-emerald-600"><span>ส่วนลดโค้ด & แต้มสะสม</span><span id="checkoutDiscountText">-฿0.00</span></div>
+          <div class="flex justify-between text-emerald-600"><span>ส่วนลดจากโค้ด</span><span id="checkoutDiscountText">-฿0.00</span></div>
           <div class="flex justify-between text-base font-bold text-slate-900 pt-2 border-t border-slate-200">
             <span>ยอดชำระสุทธิ</span><span id="checkoutFinalTotalText" class="theme-text-primary">฿0.00</span>
           </div>
@@ -826,25 +760,25 @@
     </div>
   </div>
 
-  <!-- Email Preview Modal -->
+  <!-- Email & Delivery Form Preview Modal -->
   <div id="emailPreviewModal" class="hidden fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4">
     <div class="bg-white w-full max-w-xl rounded-3xl border border-pink-100 shadow-2xl overflow-hidden animate-fade-up">
       <div class="px-6 py-4 bg-slate-900 text-white flex items-center justify-between">
-        <div class="flex items-center gap-2"><i class="fa-solid fa-envelope-open-text text-pink-400"></i><h3 id="emailModalHeaderTitle" class="font-bold text-sm">ตัวอย่างอีเมลแจ้งเตือนอัตโนมัติ</h3></div>
+        <div class="flex items-center gap-2"><i class="fa-solid fa-envelope-open-text text-pink-400"></i><h3 id="emailModalHeaderTitle" class="font-bold text-sm">ใบเสร็จการจัดส่ง & ฟอร์มรายละเอียดสินค้า</h3></div>
         <button onclick="closeModal('emailPreviewModal')" class="w-8 h-8 rounded-full bg-slate-800 text-slate-300 hover:text-white flex items-center justify-center cursor-pointer"><i class="fa-solid fa-xmark"></i></button>
       </div>
-      <div id="emailModalBodyContent" class="p-6 space-y-4 max-h-[80vh] overflow-y-auto"></div>
+      <div id="emailModalBodyContent" class="p-6 space-y-4 max-h-[82vh] overflow-y-auto"></div>
     </div>
   </div>
 
-  <!-- Product Editor Modal -->
+  <!-- Product Editor Modal (with Saved Delivery Form Builder) -->
   <div id="productEditorModal" class="hidden fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4">
-    <div class="bg-white w-full max-w-lg rounded-3xl border border-pink-100 shadow-2xl overflow-hidden animate-fade-up">
+    <div class="bg-white w-full max-w-2xl rounded-3xl border border-pink-100 shadow-2xl overflow-hidden animate-fade-up">
       <div class="px-6 py-4 bg-pink-50 border-b border-pink-100 flex items-center justify-between">
-        <h3 class="font-bold text-slate-900 text-base">📦 เพิ่ม / แก้ไขข้อมูลสินค้า</h3>
+        <h3 class="font-bold text-slate-900 text-base">📦 เพิ่ม / แก้ไขสินค้า & บันทึกฟอร์มจัดส่ง</h3>
         <button onclick="closeModal('productEditorModal')" class="w-8 h-8 rounded-full bg-white text-slate-500 hover:text-pink-600 flex items-center justify-center cursor-pointer"><i class="fa-solid fa-xmark"></i></button>
       </div>
-      <div class="p-6 space-y-3.5 max-h-[82vh] overflow-y-auto text-xs">
+      <div class="p-6 space-y-4 max-h-[84vh] overflow-y-auto text-xs">
         <input id="editProdId" type="hidden" />
         <div>
           <label class="block font-bold text-slate-700 mb-1">ชื่อแพ็กเกจสินค้า</label>
@@ -877,7 +811,32 @@
           <input type="file" accept="image/*" onchange="handleProductImageUpload(event)" class="block w-full mb-2 text-slate-600 file:mr-3 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:font-bold file:bg-pink-100 file:text-pink-700 cursor-pointer" />
           <input id="editProdImageUrl" type="text" placeholder="หรือวาง URL รูปภาพปกสินค้า..." class="w-full px-3.5 py-2 rounded-xl border border-pink-200" />
         </div>
-        <button onclick="saveProductFromEditor()" class="w-full py-3 rounded-xl theme-bg-primary text-white text-sm font-bold shadow-xs cursor-pointer">💾 บันทึกข้อมูลสินค้า</button>
+
+        <!-- DELIVERY FORM TEMPLATE BUILDER -->
+        <div class="p-4 rounded-2xl bg-pink-50/60 border border-pink-200 space-y-2.5">
+          <div class="flex flex-wrap items-center justify-between gap-2">
+            <div>
+              <label class="block font-bold text-pink-900 text-xs">📋 ฟอร์มจัดส่งสินค้าที่บันทึกไว้ (ส่งคู่กับรหัสให้อัตโนมัติ)</label>
+              <p class="text-[11px] text-slate-500">ระบบจะแทรกรหัสสินค้า อีเมลลูกค้า และเลขคำสั่งซื้อลงในฟอร์มนี้ให้อัตโนมัติทุกครั้งที่จัดส่ง</p>
+            </div>
+            <button type="button" onclick="fillDefaultDeliveryFormTemplate()" class="px-3 py-1.5 rounded-xl bg-white hover:bg-pink-100 border border-pink-300 text-pink-700 font-bold text-[11px] cursor-pointer">
+              ✨ ใส่ฟอร์มตัวอย่างมาตรฐาน
+            </button>
+          </div>
+
+          <div class="flex items-center gap-1.5 flex-wrap">
+            <span class="text-[11px] text-slate-500 font-semibold">แทรกตัวแปรอัตโนมัติ:</span>
+            <button type="button" onclick="insertFormVariable('{code}')" class="px-2 py-0.5 rounded-lg bg-slate-800 text-emerald-300 font-mono-code text-[11px] cursor-pointer" title="รหัสสินค้า / ลิงก์เชิญ">+ {code}</button>
+            <button type="button" onclick="insertFormVariable('{product}')" class="px-2 py-0.5 rounded-lg bg-white border border-pink-200 text-pink-700 font-mono-code text-[11px] cursor-pointer" title="ชื่อสินค้า">+ {product}</button>
+            <button type="button" onclick="insertFormVariable('{email}')" class="px-2 py-0.5 rounded-lg bg-white border border-pink-200 text-pink-700 font-mono-code text-[11px] cursor-pointer" title="อีเมลลูกค้า">+ {email}</button>
+            <button type="button" onclick="insertFormVariable('{order_id}')" class="px-2 py-0.5 rounded-lg bg-white border border-pink-200 text-pink-700 font-mono-code text-[11px] cursor-pointer" title="เลขคำสั่งซื้อ">+ {order_id}</button>
+            <button type="button" onclick="insertFormVariable('{date}')" class="px-2 py-0.5 rounded-lg bg-white border border-pink-200 text-pink-700 font-mono-code text-[11px] cursor-pointer" title="วันที่จัดส่ง">+ {date}</button>
+          </div>
+
+          <textarea id="editProdDeliveryForm" rows="6" placeholder="พิมพ์ฟอร์มรายละเอียดการจัดส่ง วิธีล็อกอิน เงื่อนไขรับประกัน หรือช่องทางติดต่อแอดมินที่นี่... (ใส่ {code} ในจุดที่ต้องการให้แสดงรหัสสินค้า)" class="w-full p-3 rounded-xl border border-pink-200 bg-white text-xs leading-relaxed"></textarea>
+        </div>
+
+        <button onclick="saveProductFromEditor()" class="w-full py-3 rounded-xl theme-bg-primary text-white text-sm font-bold shadow-xs cursor-pointer">💾 บันทึกข้อมูลสินค้าและฟอร์มจัดส่ง</button>
       </div>
     </div>
   </div>
@@ -923,7 +882,7 @@
   <div id="toastContainer" class="fixed bottom-4 right-4 z-50 space-y-2 max-w-sm pointer-events-none"></div>
 
   <script>
-    const STORAGE_KEY = 'pinkflow_store_clean_v9';
+    const STORAGE_KEY = 'pinkflow_store_clean_forms_v11';
 
     const THEME_PRESETS = {
       rose:   { primary: '#ec4899', hover: '#db2777', light: '#fdf2f8', border: '#fbcfe8', soft: '#fff7fa' },
@@ -941,7 +900,6 @@
         id: 'usr_pink_001',
         email: '',
         balance: 0.00,
-        points: 0,
         totalSpend: 0.00,
         tier: 'MEMBER',
         apiKey: 'pk_live_pinkflow_98a7f6d5e4c3'
@@ -950,7 +908,7 @@
         shopName: 'PinkFlow Store',
         tagline: 'ร้านแอพพรีเมี่ยมอัตโนมัติ & พรีออเดอร์ ส่งไวใน 3 วินาที',
         heroTitle: 'แอพพรีเมี่ยมแท้ ราคาสุดคุ้ม กดปุ๊บรับรหัสปั๊บ!',
-        heroSubtitle: 'รองรับทั้งสินค้าพร้อมส่งอัตโนมัติและสินค้าพรีออเดอร์ แจ้งเตือนสถานะผ่านอีเมลทันที พร้อมระบบเรทราคาตัวแทนจำหน่าย',
+        heroSubtitle: 'รองรับทั้งสินค้าพร้อมส่งอัตโนมัติและสินค้าพรีออเดอร์ จัดส่งพร้อมคู่มือการใช้งานผ่านอีเมลทันที',
         logoUrl: '',
         logoIcon: 'fa-crown',
         themeKey: 'rose',
@@ -967,8 +925,7 @@
       orders: [],
       adminEmailAlerts: [],
       slipLogs: [],
-      coupons: [],
-      pointsHistory: []
+      coupons: []
     };
 
     let state = loadState();
@@ -977,16 +934,7 @@
 
     function loadState() {
       try {
-        [
-          'pinkflow_store_clean_v8',
-          'pinkflow_store_prod_v7',
-          'pinkflow_store_prod_v6',
-          'pinkflow_store_prod_v5',
-          'pinkflow_store_v4',
-          'pinkflow_store_v3'
-        ].forEach(oldKey => localStorage.removeItem(oldKey));
-
-        const saved = localStorage.getItem(STORAGE_KEY);
+        const saved = localStorage.getItem(STORAGE_KEY) || localStorage.getItem('pinkflow_store_forms_v10');
         if (saved) {
           const parsed = JSON.parse(saved);
           const merged = Object.assign({}, DEFAULT_STATE, parsed);
@@ -1008,6 +956,129 @@
       try {
         localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
       } catch (e) {}
+    }
+
+    function escapeHtml(str) {
+      return String(str || '')
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;');
+    }
+
+    // DELIVERY FORM TEMPLATE BUILDER & FORMATTER
+    function buildFormattedDeliveryMessage(product, order, codesArray, overrideTemplate) {
+      const template = (overrideTemplate !== undefined ? overrideTemplate : (product?.deliveryForm || '')).trim();
+      const codesText = (codesArray || []).join('\n').trim();
+
+      if (!template) {
+        return codesText;
+      }
+
+      let formatted = template;
+      const hasCodePlaceholder = /\{code\}/i.test(formatted);
+
+      formatted = formatted
+        .replace(/\{code\}/gi, codesText)
+        .replace(/\{product\}/gi, order?.productName || product?.name || '')
+        .replace(/\{email\}/gi, order?.customerEmail || '')
+        .replace(/\{order_id\}/gi, order?.id || '')
+        .replace(/\{date\}/gi, order?.createdAt || new Date().toLocaleString('th-TH'));
+
+      if (!hasCodePlaceholder && codesText) {
+        formatted += `\n\n🔑 รหัสสินค้า / ข้อมูลใช้งาน:\n${codesText}`;
+      }
+
+      return formatted;
+    }
+
+    function insertFormVariable(token) {
+      const textarea = document.getElementById('editProdDeliveryForm');
+      if (!textarea) return;
+      const start = textarea.selectionStart ?? textarea.value.length;
+      const end = textarea.selectionEnd ?? textarea.value.length;
+      const before = textarea.value.substring(0, start);
+      const after = textarea.value.substring(end);
+      textarea.value = before + token + after;
+      textarea.focus();
+      textarea.selectionStart = textarea.selectionEnd = start + token.length;
+    }
+
+    function fillDefaultDeliveryFormTemplate() {
+      const textarea = document.getElementById('editProdDeliveryForm');
+      if (!textarea) return;
+      textarea.value = [
+        '🌸 ขอบคุณที่สั่งซื้อสินค้ากับ PinkFlow Store 🌸',
+        '━━━━━━━━━━━━━━━━━━━━',
+        '📦 แพ็กเกจ: {product}',
+        '🧾 เลขที่คำสั่งซื้อ: #{order_id}',
+        '📧 บัญชีลูกค้า: {email}',
+        '📅 วันที่จัดส่ง: {date}',
+        '',
+        '🔑 ข้อมูลบัญชี / รหัสใช้งานของคุณ:',
+        '{code}',
+        '',
+        '📌 วิธีใช้งานและเงื่อนไขการรับประกัน:',
+        '1. เข้าสู่ระบบตามข้อมูลด้านบนและห้ามเปลี่ยนรหัสผ่านหรือแก้ไขข้อมูลบัญชี',
+        '2. หากพบปัญหาการใช้งาน กรุณาแจ้งแอดมินพร้อมเลขที่คำสั่งซื้อได้ตลอด 24 ชม.',
+        '━━━━━━━━━━━━━━━━━━━━'
+      ].join('\n');
+    }
+
+    function copyOrderDeliveredText(orderId, copyType = 'FORM') {
+      const o = state.orders.find(x => x.id === orderId);
+      if (!o) return;
+      const rawCode = (o.deliveredData || []).join('\n');
+      const textToCopy = copyType === 'CODE'
+        ? rawCode
+        : (o.deliveredFormatted || rawCode);
+      if (!textToCopy) return;
+      copyTextValue(textToCopy, copyType === 'CODE' ? 'คัดลอกเฉพาะรหัสสินค้าแล้ว!' : 'คัดลอกฟอร์มจัดส่งและรหัสทั้งหมดแล้ว!');
+    }
+
+    async function sendDeliveryEmailNotification(order) {
+      if (!order || !order.customerEmail) return;
+      const bodyText = order.deliveredFormatted || (order.deliveredData || []).join('\n');
+      const htmlContent = `
+        <div style="font-family:sans-serif;max-width:560px;margin:0 auto;padding:24px;border:1px solid #fbcfe8;border-radius:16px;background:#fff7fa;">
+          <h2 style="color:#db2777;margin-top:0;">🌸 จัดส่งสินค้าเรียบร้อยแล้ว (#${escapeHtml(order.id)})</h2>
+          <p style="color:#334155;font-size:14px;">รายการสินค้า: <b>${escapeHtml(order.productName)}</b></p>
+          <pre style="white-space:pre-wrap;background:#ffffff;border:1px solid #fbcfe8;padding:16px;border-radius:12px;font-family:sans-serif;font-size:13px;line-height:1.6;color:#0f172a;">${escapeHtml(bodyText)}</pre>
+        </div>
+      `;
+      try {
+        await fetch('/.netlify/functions/send-email', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            to: order.customerEmail,
+            subject: `[${state.settings.shopName}] จัดส่งสินค้า ${order.productName} (#${order.id})`,
+            htmlContent
+          })
+        });
+      } catch (e) {}
+    }
+
+    function openOrderEmailModal(orderId) {
+      const o = state.orders.find(x => x.id === orderId);
+      if (!o) return;
+      const bodyText = o.deliveredFormatted || (o.deliveredData || []).join('\n') || 'อยู่ระหว่างดำเนินการจัดส่ง';
+      document.getElementById('emailModalHeaderTitle').textContent = `📧 รายละเอียดการจัดส่ง #${o.id}`;
+      document.getElementById('emailModalBodyContent').innerHTML = `
+        <div class="space-y-3 text-xs">
+          <div class="p-3.5 rounded-2xl bg-pink-50/70 border border-pink-200 space-y-1">
+            <div><span class="text-slate-500">ผู้รับอีเมล:</span> <span class="font-bold text-slate-900">${escapeHtml(o.customerEmail)}</span></div>
+            <div><span class="text-slate-500">หัวข้อ:</span> <span class="font-bold text-pink-700">[${escapeHtml(state.settings.shopName)}] จัดส่งสินค้า ${escapeHtml(o.productName)} (#${escapeHtml(o.id)})</span></div>
+            <div><span class="text-slate-500">เวลาจัดส่ง:</span> <span class="text-slate-700">${escapeHtml(o.fulfilledAt || o.createdAt)}</span></div>
+          </div>
+          <div class="p-4 rounded-2xl bg-slate-50 border border-slate-200 whitespace-pre-wrap leading-relaxed text-slate-800 text-xs">${escapeHtml(bodyText)}</div>
+          <div class="flex gap-2">
+            <button onclick="copyOrderDeliveredText('${o.id}', 'FORM')" class="flex-1 py-2.5 rounded-xl theme-bg-primary text-white font-bold cursor-pointer">📋 คัดลอกฟอร์มจัดส่งทั้งหมด</button>
+            <button onclick="copyOrderDeliveredText('${o.id}', 'CODE')" class="px-4 py-2.5 rounded-xl bg-slate-900 text-emerald-300 font-bold cursor-pointer">🔑 คัดลอกเฉพาะรหัส</button>
+          </div>
+        </div>
+      `;
+      document.getElementById('emailPreviewModal')?.classList.remove('hidden');
     }
 
     function isAdminAccount() {
@@ -1235,23 +1306,30 @@
         const data = await res.json();
         if (res.ok && data.success && data.user) {
           state.user.balance = Number(data.user.balance || 0);
-          state.user.points = Number(data.user.points || 0);
           state.user.tier = data.user.tier || 'MEMBER';
           if (Array.isArray(data.orders) && data.orders.length > 0) {
-            state.orders = data.orders.map(o => ({
-              id: o.id,
-              productId: o.product_id,
-              productName: o.product_name,
-              mode: o.mode,
-              qty: o.qty,
-              totalPaid: Number(o.total_paid || 0),
-              status: o.status,
-              deliveredData: o.delivered_code ? o.delivered_code.split('\n').filter(Boolean) : [],
-              customerEmail: o.user_email,
-              customerNote: o.customer_note || '',
-              daysRemaining: o.days_remaining || 30,
-              createdAt: o.created_at
-            }));
+            state.orders = data.orders.map(o => {
+              const prod = state.products.find(p => p.id === o.product_id);
+              const rawCodes = o.delivered_code ? o.delivered_code.split('\n').filter(Boolean) : [];
+              const mappedOrder = {
+                id: o.id,
+                productId: o.product_id,
+                productName: o.product_name,
+                mode: o.mode,
+                qty: o.qty,
+                totalPaid: Number(o.total_paid || 0),
+                status: o.status,
+                deliveredData: rawCodes,
+                customerEmail: o.user_email,
+                customerNote: o.customer_note || '',
+                daysRemaining: o.days_remaining || 30,
+                createdAt: o.created_at
+              };
+              mappedOrder.deliveredFormatted = rawCodes.length > 0
+                ? buildFormattedDeliveryMessage(prod, mappedOrder, rawCodes)
+                : '';
+              return mappedOrder;
+            });
           }
           saveState();
           updateSecurityVisibility();
@@ -1445,7 +1523,7 @@
 
       catBar.innerHTML = categories.map(cat => `
         <button onclick="state.selectedCategory='${cat}'; renderProductsGrid()" class="px-3.5 py-1.5 rounded-xl text-xs font-bold whitespace-nowrap transition cursor-pointer ${state.selectedCategory === cat ? 'theme-bg-primary text-white' : 'bg-pink-50 text-slate-600 hover:bg-pink-100'}">
-          ${cat}
+          ${escapeHtml(cat)}
         </button>
       `).join('');
 
@@ -1466,7 +1544,7 @@
           <div class="col-span-full bg-white rounded-3xl border border-pink-100 p-10 text-center space-y-2">
             <div class="text-3xl">🛍️</div>
             <div class="text-sm font-bold text-slate-800">ยังไม่มีรายการสินค้าในหมวดหมู่นี้</div>
-            <p class="text-xs text-slate-500">แอดมินสามารถเพิ่มรายการสินค้าและรูปภาพปกได้ที่ระบบหลังบ้าน</p>
+            <p class="text-xs text-slate-500">แอดมินสามารถเพิ่มรายการสินค้า รูปภาพปก และฟอร์มจัดส่งได้ที่ระบบหลังบ้าน</p>
           </div>
         `;
         return;
@@ -1481,15 +1559,15 @@
         return `
           <div class="bg-white rounded-3xl border border-pink-100 shadow-2xs hover:shadow-md transition overflow-hidden flex flex-col">
             <div class="relative h-40 bg-pink-50 overflow-hidden">
-              <img src="${imgUrl}" onerror="this.src='https://placehold.co/400x240/fce7f3/db2777?text=PinkFlow'" alt="${p.name}" class="w-full h-full object-cover" />
+              <img src="${imgUrl}" onerror="this.src='https://placehold.co/400x240/fce7f3/db2777?text=PinkFlow'" alt="${escapeHtml(p.name)}" class="w-full h-full object-cover" />
               <span class="absolute top-3 left-3 px-2.5 py-1 rounded-full text-[11px] font-bold shadow-xs ${p.mode === 'PREORDER' ? 'bg-amber-500 text-white' : (stockCount > 0 ? 'bg-emerald-600 text-white' : 'bg-slate-600 text-white')}">
                 ${p.mode === 'PREORDER' ? '⏳ พรีออเดอร์' : `⚡ พร้อมส่ง (${stockCount})`}
               </span>
             </div>
             <div class="p-4 flex-1 flex flex-col justify-between space-y-3">
               <div>
-                <div class="text-[11px] text-slate-400 font-medium">${p.category}</div>
-                <h3 class="font-bold text-slate-900 text-sm sm:text-base line-clamp-2 mt-0.5">${p.name}</h3>
+                <div class="text-[11px] text-slate-400 font-medium">${escapeHtml(p.category)}</div>
+                <h3 class="font-bold text-slate-900 text-sm sm:text-base line-clamp-2 mt-0.5">${escapeHtml(p.name)}</h3>
               </div>
               <div class="pt-2 border-t border-pink-50 flex items-center justify-between gap-2">
                 <div>
@@ -1538,10 +1616,9 @@
       const couponSelect = document.getElementById('checkoutCouponSelect');
       couponSelect.innerHTML = `<option value="">-- ไม่ใช้โค้ดส่วนลด --</option>` + state.coupons
         .filter(c => c.quota > 0)
-        .map(c => `<option value="${c.code}">${c.code} (ลด ฿${c.discount} เมื่อซื้อครบ ฿${c.minSpend})</option>`)
+        .map(c => `<option value="${escapeHtml(c.code)}">${escapeHtml(c.code)} (ลด ฿${c.discount} เมื่อซื้อครบ ฿${c.minSpend})</option>`)
         .join('');
 
-      document.getElementById('checkoutUsePointsCheckbox').checked = false;
       recalculateCheckoutSummary();
       document.getElementById('checkoutModal')?.classList.remove('hidden');
     }
@@ -1568,16 +1645,6 @@
         discount += Number(coupon.discount || 0);
       }
 
-      const maxPointsCash = Math.floor(state.user.points / 10) * 2;
-      document.getElementById('checkoutAvailablePointsDiscount').textContent = `มี ${state.user.points} แต้ม (ลดได้ ฿${maxPointsCash})`;
-
-      let pointsUsed = 0;
-      if (document.getElementById('checkoutUsePointsCheckbox')?.checked && maxPointsCash > 0) {
-        const usableCash = Math.min(maxPointsCash, Math.max(0, subtotal - discount));
-        discount += usableCash;
-        pointsUsed = (usableCash / 2) * 10;
-      }
-
       const finalTotal = Math.max(0, subtotal - discount);
       const afterBal = state.user.balance - finalTotal;
 
@@ -1586,13 +1653,13 @@
       document.getElementById('checkoutFinalTotalText').textContent = `฿${finalTotal.toFixed(2)}`;
       document.getElementById('checkoutAfterBalanceText').textContent = `฿${afterBal.toFixed(2)}`;
 
-      return { p, subtotal, discount, finalTotal, pointsUsed, coupon };
+      return { p, subtotal, discount, finalTotal, coupon };
     }
 
     async function confirmCheckoutOrder() {
       const summary = recalculateCheckoutSummary();
       if (!summary) return;
-      const { p, finalTotal, pointsUsed, coupon } = summary;
+      const { p, finalTotal, coupon } = summary;
       const qty = activeCheckoutState.qty;
 
       if (state.user.balance < finalTotal) {
@@ -1646,20 +1713,12 @@
 
       state.user.balance -= finalTotal;
       state.user.totalSpend += finalTotal;
-      if (pointsUsed > 0) {
-        state.user.points -= pointsUsed;
-        state.pointsHistory.unshift({ label: `ใช้แต้มแลกส่วนลด #${orderId}`, delta: -pointsUsed, time: new Date().toLocaleString('th-TH') });
-      }
-      const earnedPts = Math.floor(finalTotal / 10);
-      if (earnedPts > 0) {
-        state.user.points += earnedPts;
-        state.pointsHistory.unshift({ label: `รับแต้มจากคำสั่งซื้อ #${orderId}`, delta: +earnedPts, time: new Date().toLocaleString('th-TH') });
-      }
       if (coupon) coupon.quota = Math.max(0, coupon.quota - 1);
 
       if (state.user.totalSpend >= 1500 && state.user.tier !== 'VIP') state.user.tier = 'VIP';
       else if (state.user.totalSpend >= 500 && state.user.tier === 'MEMBER') state.user.tier = 'AGENT';
 
+      const createdAtStr = new Date().toLocaleString('th-TH');
       const newOrder = {
         id: orderId,
         productId: p.id,
@@ -1669,11 +1728,18 @@
         totalPaid: finalTotal,
         status: p.mode === 'PREORDER' ? 'PENDING_PREORDER' : 'COMPLETED',
         deliveredData: deliveredCodes,
+        deliveredFormatted: '',
         customerEmail,
         customerNote,
         daysRemaining: 30,
-        createdAt: new Date().toLocaleString('th-TH')
+        createdAt: createdAtStr
       };
+
+      if (p.mode === 'INSTANT') {
+        newOrder.deliveredFormatted = buildFormattedDeliveryMessage(p, newOrder, deliveredCodes);
+        sendDeliveryEmailNotification(newOrder);
+      }
+
       state.orders.unshift(newOrder);
 
       if (p.mode === 'PREORDER') {
@@ -1684,17 +1750,17 @@
           customerEmail,
           note: customerNote || '-',
           read: false,
-          time: new Date().toLocaleString('th-TH')
+          time: createdAtStr
         });
       }
 
       saveState();
       closeModal('checkoutModal');
       switchStoreTab('ORDERS');
-      showToast(p.mode === 'PREORDER' ? '⏳ สั่งซื้อพรีออเดอร์สำเร็จ! แจ้งเตือนแอดมินแล้ว' : '🎉 สั่งซื้อสำเร็จ! รับรหัสสินค้าด้านล่างได้เลย', 'success');
+      showToast(p.mode === 'PREORDER' ? '⏳ สั่งซื้อพรีออเดอร์สำเร็จ! แจ้งเตือนแอดมินแล้ว' : '🎉 สั่งซื้อสำเร็จ! รับรหัสพร้อมฟอร์มจัดส่งด้านล่างได้เลย', 'success');
     }
 
-    // ORDERS, REWARDS & API
+    // ORDERS, COUPONS & API
     function renderOrdersTab() {
       const badge = document.getElementById('totalOrdersCountBadge');
       const list = document.getElementById('ordersListContainer');
@@ -1715,64 +1781,57 @@
 
       list.innerHTML = state.orders.map(o => {
         const isPending = o.status === 'PENDING_PREORDER';
+        const rawCodeStr = (o.deliveredData || []).join(' | ');
+        const formattedText = o.deliveredFormatted || '';
+        const hasCustomForm = Boolean(formattedText && formattedText !== (o.deliveredData || []).join('\n').trim());
+
         return `
-          <div class="p-4 rounded-2xl border border-pink-100 bg-pink-50/30 space-y-2.5">
+          <div class="p-4 sm:p-5 rounded-2xl border border-pink-100 bg-pink-50/30 space-y-3">
             <div class="flex flex-wrap items-center justify-between gap-2">
               <div>
-                <span class="font-mono-code text-xs font-bold text-slate-500">#${o.id}</span>
-                <h4 class="font-bold text-slate-900 text-sm">${o.productName} (x${o.qty})</h4>
-                <div class="text-[11px] text-slate-500">${o.createdAt} • ชำระ ฿${Number(o.totalPaid).toFixed(2)}</div>
+                <span class="font-mono-code text-xs font-bold text-slate-500">#${escapeHtml(o.id)}</span>
+                <h4 class="font-bold text-slate-900 text-sm sm:text-base">${escapeHtml(o.productName)} (x${o.qty})</h4>
+                <div class="text-[11px] text-slate-500">${escapeHtml(o.createdAt)} • อีเมลรับสินค้า: ${escapeHtml(o.customerEmail)} • ชำระ ฿${Number(o.totalPaid).toFixed(2)}</div>
               </div>
-              <span class="px-3 py-1 rounded-full text-xs font-bold ${isPending ? 'bg-amber-100 text-amber-800' : 'bg-emerald-100 text-emerald-700'}">
-                ${isPending ? '⏳ รอแอดมินจัดส่งเข้าเมล' : '✅ จัดส่งสำเร็จ'}
-              </span>
+              <div class="flex items-center gap-2">
+                ${!isPending ? `
+                  <button onclick="openOrderEmailModal('${o.id}')" class="px-3 py-1.5 rounded-xl bg-white hover:bg-pink-50 border border-pink-200 text-pink-700 text-xs font-bold cursor-pointer">
+                    📧 เปิดอ่านอีเมลจัดส่ง
+                  </button>
+                ` : ''}
+                <span class="px-3 py-1 rounded-full text-xs font-bold ${isPending ? 'bg-amber-100 text-amber-800' : 'bg-emerald-100 text-emerald-700'}">
+                  ${isPending ? '⏳ รอแอดมินจัดส่งเข้าเมล' : '✅ จัดส่งสำเร็จ'}
+                </span>
+              </div>
             </div>
-            ${!isPending && o.deliveredData?.length > 0 ? `
-              <div class="p-3 rounded-xl bg-slate-900 text-emerald-300 font-mono-code text-xs flex items-center justify-between gap-2">
-                <div class="break-all">${o.deliveredData.join(' | ')}</div>
-                <button onclick="copyTextValue(\`${o.deliveredData.join('\n')}\`, 'คัดลอกรหัสสินค้าแล้ว!')" class="px-2.5 py-1 rounded-lg bg-pink-600 text-white font-sans font-bold shrink-0 cursor-pointer">คัดลอก</button>
+
+            ${!isPending && hasCustomForm ? `
+              <div class="p-4 rounded-2xl bg-white border border-pink-200 space-y-2.5">
+                <div class="flex flex-wrap items-center justify-between gap-2 border-b border-pink-100 pb-2">
+                  <span class="text-xs font-bold text-pink-800">📋 ฟอร์มรายละเอียดการจัดส่ง & คู่มือการใช้งาน</span>
+                  <div class="flex items-center gap-1.5">
+                    <button onclick="copyOrderDeliveredText('${o.id}', 'FORM')" class="px-3 py-1 rounded-lg theme-bg-primary text-white text-xs font-bold cursor-pointer">
+                      📋 คัดลอกฟอร์มทั้งหมด
+                    </button>
+                    <button onclick="copyOrderDeliveredText('${o.id}', 'CODE')" class="px-3 py-1 rounded-lg bg-slate-900 text-emerald-300 text-xs font-bold cursor-pointer">
+                      🔑 คัดลอกเฉพาะรหัส
+                    </button>
+                  </div>
+                </div>
+                <pre class="whitespace-pre-wrap font-sans text-xs text-slate-800 leading-relaxed">${escapeHtml(formattedText)}</pre>
               </div>
-            ` : ''}
+            ` : (!isPending && rawCodeStr ? `
+              <div class="p-3 rounded-xl bg-slate-900 text-emerald-300 font-mono-code text-xs flex items-center justify-between gap-2">
+                <div class="break-all">${escapeHtml(rawCodeStr)}</div>
+                <button onclick="copyOrderDeliveredText('${o.id}', 'CODE')" class="px-2.5 py-1 rounded-lg bg-pink-600 text-white font-sans font-bold shrink-0 cursor-pointer">คัดลอก</button>
+              </div>
+            ` : '')}
           </div>
         `;
       }).join('');
     }
 
-    function updateRedeemPreview() {
-      const pts = Math.max(10, Number(document.getElementById('redeemPointsInput')?.value || 50));
-      const method = document.getElementById('redeemMethodSelect')?.value || 'WALLET';
-      document.getElementById('redeemPromptPayBox')?.classList.toggle('hidden', method !== 'PROMPTPAY');
-      const baseCash = (pts / 10) * 2;
-      const finalCash = method === 'WALLET' ? baseCash * 1.1 : baseCash;
-      document.getElementById('redeemReceiveAmountText').textContent = `฿${finalCash.toFixed(2)}`;
-    }
-
-    function redeemPointsAction() {
-      const pts = Math.floor(Number(document.getElementById('redeemPointsInput')?.value || 0));
-      const method = document.getElementById('redeemMethodSelect')?.value || 'WALLET';
-      if (pts < 10 || pts > state.user.points) {
-        showToast('⚠️ แต้มสะสมไม่เพียงพอสำหรับการแลก', 'warning');
-        return;
-      }
-      const baseCash = (pts / 10) * 2;
-      const finalCash = method === 'WALLET' ? baseCash * 1.1 : baseCash;
-      state.user.points -= pts;
-      if (method === 'WALLET') {
-        state.user.balance += finalCash;
-      }
-      state.pointsHistory.unshift({
-        label: method === 'WALLET' ? `แลกแต้มเข้ากระเป๋าเครดิต (+฿${finalCash.toFixed(2)})` : `แลกแต้มโอนพร้อมเพย์ (฿${finalCash.toFixed(2)})`,
-        delta: -pts,
-        time: new Date().toLocaleString('th-TH')
-      });
-      saveState();
-      renderAll();
-      showToast(`✨ แลก ${pts} แต้ม เป็นเงิน ฿${finalCash.toFixed(2)} สำเร็จ!`, 'success');
-    }
-
     function renderRewardsTab() {
-      document.getElementById('rewardsPointsBalance').textContent = `${state.user.points} แต้ม`;
-      document.getElementById('rewardsCashEquivalent').textContent = `มูลค่า ฿${((state.user.points / 10) * 2).toFixed(2)}`;
       document.getElementById('currentTierBadgeCard').textContent = state.user.tier;
       document.getElementById('totalSpendDisplay').textContent = `฿${state.user.totalSpend.toFixed(2)}`;
 
@@ -1782,20 +1841,13 @@
         ? 'ระดับสูงสุด VIP แล้ว!'
         : (state.user.totalSpend >= 500 ? `อีก ฿${(1500 - state.user.totalSpend).toFixed(0)} ถึง VIP` : `อีก ฿${(500 - state.user.totalSpend).toFixed(0)} ถึง Agent`);
 
-      document.getElementById('pointsHistoryList').innerHTML = state.pointsHistory.map(h => `
-        <div class="flex items-center justify-between text-xs p-2 rounded-xl bg-slate-50 border border-slate-100">
-          <span>${h.label}</span>
-          <span class="font-bold ${h.delta >= 0 ? 'text-emerald-600' : 'text-rose-600'}">${h.delta >= 0 ? '+' : ''}${h.delta} แต้ม</span>
-        </div>
-      `).join('') || `<div class="text-xs text-slate-400">ยังไม่มีประวัติแต้มสะสม</div>`;
-
       document.getElementById('storeCouponsList').innerHTML = state.coupons.map(c => `
         <div class="p-3 rounded-2xl border border-pink-200 bg-pink-50/40 flex items-center justify-between">
           <div>
-            <div class="font-bold text-pink-700 text-xs">${c.code} — ลด ฿${c.discount}</div>
+            <div class="font-bold text-pink-700 text-xs">${escapeHtml(c.code)} — ลด ฿${c.discount}</div>
             <div class="text-[11px] text-slate-500">ขั้นต่ำ ฿${c.minSpend} • เหลือ ${c.quota} สิทธิ์</div>
           </div>
-          <button onclick="copyTextValue('${c.code}', 'คัดลอกโค้ด ${c.code} แล้ว!')" class="px-3 py-1.5 rounded-xl theme-bg-primary text-white text-xs font-bold cursor-pointer">เก็บโค้ด</button>
+          <button onclick="copyTextValue('${escapeHtml(c.code)}', 'คัดลอกโค้ด ${escapeHtml(c.code)} แล้ว!')" class="px-3 py-1.5 rounded-xl theme-bg-primary text-white text-xs font-bold cursor-pointer">เก็บโค้ด</button>
         </div>
       `).join('') || `<div class="text-xs text-slate-400">ยังไม่มีโค้ดส่วนลดในขณะนี้</div>`;
     }
@@ -1813,7 +1865,8 @@
         product_id: p.id,
         name: p.name,
         reseller_price: getEffectiveUnitPrice(p),
-        in_stock: (p.codes || []).length
+        in_stock: (p.codes || []).length,
+        has_delivery_form: Boolean(p.deliveryForm)
       }, null, 2);
     }
 
@@ -1837,7 +1890,7 @@
       document.getElementById('adminLowStockList').innerHTML = lowStockProducts.map(p => `
         <div class="p-3.5 rounded-2xl border border-amber-200 bg-amber-50/50 flex items-center justify-between">
           <div>
-            <div class="font-bold text-slate-900 text-xs">${p.name}</div>
+            <div class="font-bold text-slate-900 text-xs">${escapeHtml(p.name)}</div>
             <div class="text-[11px] text-amber-700">เหลือสต็อก ${(p.codes || []).length} ชิ้น</div>
           </div>
           <button onclick="switchAdminTab('STOCKS')" class="px-3 py-1.5 rounded-xl theme-bg-primary text-white text-xs font-bold cursor-pointer">+ เติมรหัส</button>
@@ -1847,30 +1900,48 @@
       // Preorders & Inbox
       document.getElementById('adminEmailInboxList').innerHTML = state.adminEmailAlerts.map(m => `
         <div class="p-3 rounded-2xl border ${m.read ? 'border-slate-100 bg-slate-50' : 'border-pink-200 bg-pink-50/50'} text-xs space-y-1">
-          <div class="font-bold text-slate-900">${m.productName} (#${m.orderId})</div>
-          <div class="text-slate-500">ลูกค้า: ${m.customerEmail} • ${m.time}</div>
+          <div class="font-bold text-slate-900">${escapeHtml(m.productName)} (#${escapeHtml(m.orderId)})</div>
+          <div class="text-slate-500">ลูกค้า: ${escapeHtml(m.customerEmail)} • ${escapeHtml(m.time)}</div>
         </div>
       `).join('') || `<div class="text-xs text-slate-400">ยังไม่มีอีเมลแจ้งเตือน</div>`;
 
       document.getElementById('adminPreordersQueueList').innerHTML = state.orders.filter(o => o.mode === 'PREORDER').map(o => {
         const isPending = o.status === 'PENDING_PREORDER';
+        const prod = state.products.find(p => p.id === o.productId);
+        const savedForm = prod?.deliveryForm || '';
         return `
-          <div class="p-4 rounded-2xl border border-amber-200 bg-amber-50/40 space-y-2.5">
-            <div class="flex items-center justify-between">
+          <div class="p-4 rounded-2xl border border-amber-200 bg-amber-50/40 space-y-3">
+            <div class="flex items-center justify-between gap-2">
               <div>
-                <div class="font-bold text-slate-900 text-sm">${o.productName} (#${o.id})</div>
-                <div class="text-xs text-slate-500">อีเมล: ${o.customerEmail} • หมายเหตุ: ${o.customerNote || '-'}</div>
+                <div class="font-bold text-slate-900 text-sm">${escapeHtml(o.productName)} (#${escapeHtml(o.id)})</div>
+                <div class="text-xs text-slate-500">อีเมลลูกค้า: <span class="font-semibold text-slate-700">${escapeHtml(o.customerEmail)}</span> • หมายเหตุ: ${escapeHtml(o.customerNote || '-')}</div>
               </div>
-              <span class="px-2.5 py-0.5 rounded-full text-xs font-bold ${isPending ? 'bg-amber-200 text-amber-900' : 'bg-emerald-100 text-emerald-700'}">
+              <span class="px-2.5 py-0.5 rounded-full text-xs font-bold shrink-0 ${isPending ? 'bg-amber-200 text-amber-900' : 'bg-emerald-100 text-emerald-700'}">
                 ${isPending ? 'รอจัดส่ง' : 'ส่งแล้ว'}
               </span>
             </div>
             ${isPending ? `
-              <div class="flex gap-2">
-                <input id="fulfillCodeInput-${o.id}" type="text" placeholder="กรอกรหัสสินค้าที่จะส่งเข้าอีเมลลูกค้า..." class="flex-1 px-3 py-2 rounded-xl border border-amber-300 bg-white font-mono-code text-xs" />
-                <button onclick="fulfillPreorderAndSendEmail('${o.id}')" class="px-4 py-2 rounded-xl theme-bg-primary text-white text-xs font-bold cursor-pointer">📨 ส่งรหัส</button>
+              <div class="space-y-2.5 pt-1 border-t border-amber-200/70">
+                <div>
+                  <label class="block text-[11px] font-bold text-slate-700 mb-1">1. กรอกรหัสสินค้า / ลิงก์เชิญ ({code}) *</label>
+                  <input id="fulfillCodeInput-${o.id}" type="text" placeholder="กรอกรหัสสินค้าหรือลิงก์เชิญที่จะแทรกลงในฟอร์ม..." class="w-full px-3 py-2 rounded-xl border border-amber-300 bg-white font-mono-code text-xs" />
+                </div>
+                <div>
+                  <div class="flex items-center justify-between mb-1">
+                    <label class="text-[11px] font-bold text-slate-700">2. ฟอร์มจัดส่งที่จะแนบส่งไปพร้อมรหัส (${savedForm ? 'ดึงจากฟอร์มที่บันทึกไว้แล้ว' : 'ยังไม่ตั้งฟอร์มในสินค้า สามารถพิมพ์เพิ่มได้'})</label>
+                  </div>
+                  <textarea id="fulfillFormInput-${o.id}" rows="4" placeholder="ระบบจะนำรหัสด้านบนไปแทนที่ตำแหน่ง {code} ในฟอร์มนี้โดยอัตโนมัติ..." class="w-full p-2.5 rounded-xl border border-amber-300 bg-white text-xs leading-relaxed">${escapeHtml(savedForm)}</textarea>
+                </div>
+                <button onclick="fulfillPreorderAndSendEmail('${o.id}')" class="w-full py-2.5 rounded-xl theme-bg-primary text-white text-xs font-bold shadow-xs cursor-pointer">
+                  📨 จัดส่งรหัสพร้อมฟอร์มเข้าอีเมลลูกค้าทันที
+                </button>
               </div>
-            ` : `<div class="text-xs font-mono-code text-emerald-800">รหัส: ${o.deliveredData.join(', ')}</div>`}
+            ` : `
+              <div class="flex items-center justify-between gap-2 pt-1 border-t border-amber-200/60">
+                <div class="text-xs font-mono-code text-emerald-800 truncate">รหัส: ${escapeHtml((o.deliveredData || []).join(', '))}</div>
+                <button onclick="openOrderEmailModal('${o.id}')" class="px-3 py-1 rounded-lg bg-white border border-pink-200 text-pink-700 text-xs font-bold shrink-0 cursor-pointer">👁️ ดูฟอร์มที่ส่งแล้ว</button>
+              </div>
+            `}
           </div>
         `;
       }).join('') || `<div class="text-xs text-slate-400">ยังไม่มีรายการพรีออเดอร์</div>`;
@@ -1878,16 +1949,24 @@
       // Admin Products Table
       document.getElementById('adminProductsTable').innerHTML = state.products.length > 0
         ? state.products.map(p => `
-          <div class="p-4 rounded-2xl border border-pink-100 bg-pink-50/20 space-y-3">
-            <div class="flex items-center gap-3">
-              <img src="${p.imageUrl || 'https://placehold.co/120x120/fce7f3/db2777?text=App'}" class="w-12 h-12 rounded-xl object-cover border border-pink-200" />
-              <div class="flex-1 min-w-0">
-                <div class="font-bold text-slate-900 text-sm truncate">${p.name}</div>
-                <div class="text-xs text-slate-500">ขาย ฿${p.price} / ทุน ฿${p.cost} • ${p.mode === 'PREORDER' ? 'พรีออเดอร์' : `สต็อก ${(p.codes || []).length}`}</div>
+          <div class="p-4 rounded-2xl border border-pink-100 bg-pink-50/20 space-y-3 flex flex-col justify-between">
+            <div class="space-y-2.5">
+              <div class="flex items-center gap-3">
+                <img src="${p.imageUrl || 'https://placehold.co/120x120/fce7f3/db2777?text=App'}" class="w-12 h-12 rounded-xl object-cover border border-pink-200 shrink-0" />
+                <div class="flex-1 min-w-0">
+                  <div class="font-bold text-slate-900 text-sm truncate">${escapeHtml(p.name)}</div>
+                  <div class="text-xs text-slate-500">ขาย ฿${p.price} / ทุน ฿${p.cost} • ${p.mode === 'PREORDER' ? 'พรีออเดอร์' : `สต็อก ${(p.codes || []).length}`}</div>
+                </div>
+              </div>
+              <div>
+                ${p.deliveryForm
+                  ? `<span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-emerald-100 text-emerald-700">📋 บันทึกฟอร์มจัดส่งแล้ว</span>`
+                  : `<span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-slate-100 text-slate-500">📝 ยังไม่ตั้งฟอร์มจัดส่ง (ส่งเฉพาะรหัส)</span>`
+                }
               </div>
             </div>
             <div class="flex gap-2">
-              <button onclick="openProductEditorModal('${p.id}')" class="flex-1 py-1.5 rounded-xl bg-white border border-pink-200 text-xs font-bold text-slate-700 hover:bg-pink-50 cursor-pointer">✏️ แก้ไข</button>
+              <button onclick="openProductEditorModal('${p.id}')" class="flex-1 py-1.5 rounded-xl bg-white border border-pink-200 text-xs font-bold text-slate-700 hover:bg-pink-50 cursor-pointer">✏️ แก้ไขสินค้า & ฟอร์ม</button>
               <button onclick="deleteProductById('${p.id}')" class="px-3 py-1.5 rounded-xl bg-rose-50 text-rose-600 text-xs font-bold hover:bg-rose-100 cursor-pointer">ลบ</button>
             </div>
           </div>
@@ -1898,7 +1977,7 @@
       const stockSelect = document.getElementById('adminStockProductSelect');
       if (stockSelect) {
         const prev = stockSelect.value;
-        stockSelect.innerHTML = state.products.filter(p => p.mode === 'INSTANT').map(p => `<option value="${p.id}">${p.name}</option>`).join('');
+        stockSelect.innerHTML = state.products.filter(p => p.mode === 'INSTANT').map(p => `<option value="${p.id}">${escapeHtml(p.name)}</option>`).join('');
         if (prev) stockSelect.value = prev;
         renderAdminStockCodes();
       }
@@ -1907,12 +1986,12 @@
       document.getElementById('adminSlipLogsList').innerHTML = state.slipLogs.map(s => `
         <div class="p-3 rounded-2xl border border-slate-100 bg-slate-50 flex items-center justify-between text-xs">
           <div>
-            <span class="font-mono-code font-bold">${s.transRef}</span> • <span>${s.email}</span>
-            <div class="text-[11px] text-slate-400">${s.time}</div>
+            <span class="font-mono-code font-bold">${escapeHtml(s.transRef)}</span> • <span>${escapeHtml(s.email)}</span>
+            <div class="text-[11px] text-slate-400">${escapeHtml(s.time)}</div>
           </div>
           <div class="text-right">
             <div class="font-bold text-emerald-600">+฿${Number(s.amount).toFixed(2)}</div>
-            <div class="text-[10px] font-bold text-slate-500">${s.status}</div>
+            <div class="text-[10px] font-bold text-slate-500">${escapeHtml(s.status)}</div>
           </div>
         </div>
       `).join('') || `<div class="text-xs text-slate-400">ยังไม่มีประวัติการตรวจสลิป</div>`;
@@ -1921,10 +2000,10 @@
       document.getElementById('adminCouponsList').innerHTML = state.coupons.map(c => `
         <div class="p-3.5 rounded-2xl border border-pink-200 bg-pink-50/40 flex items-center justify-between text-xs">
           <div>
-            <div class="font-bold text-pink-700">${c.code} (ลด ฿${c.discount})</div>
+            <div class="font-bold text-pink-700">${escapeHtml(c.code)} (ลด ฿${c.discount})</div>
             <div class="text-slate-500">ขั้นต่ำ ฿${c.minSpend} • คงเหลือ ${c.quota}</div>
           </div>
-          <button onclick="deleteCouponById('${c.code}')" class="px-2.5 py-1 rounded-lg bg-rose-100 text-rose-700 font-bold cursor-pointer">ลบ</button>
+          <button onclick="deleteCouponById('${escapeHtml(c.code)}')" class="px-2.5 py-1 rounded-lg bg-rose-100 text-rose-700 font-bold cursor-pointer">ลบ</button>
         </div>
       `).join('') || `<div class="text-xs text-slate-400">ยังไม่มีโค้ดส่วนลด</div>`;
     }
@@ -1938,6 +2017,7 @@
       document.getElementById('editProdPrice').value = p ? p.price : 99;
       document.getElementById('editProdCost').value = p ? p.cost : 45;
       document.getElementById('editProdImageUrl').value = p ? (p.imageUrl || '') : '';
+      document.getElementById('editProdDeliveryForm').value = p ? (p.deliveryForm || '') : '';
       document.getElementById('productEditorModal')?.classList.remove('hidden');
     }
 
@@ -1963,11 +2043,12 @@
       const price = Math.max(1, Number(document.getElementById('editProdPrice').value || 99));
       const cost = Math.max(0, Number(document.getElementById('editProdCost').value || 0));
       const imageUrl = (document.getElementById('editProdImageUrl').value || '').trim();
+      const deliveryForm = (document.getElementById('editProdDeliveryForm')?.value || '').trim();
 
       if (id) {
         const idx = state.products.findIndex(x => x.id === id);
         if (idx !== -1) {
-          state.products[idx] = { ...state.products[idx], name, category, mode, price, cost, imageUrl };
+          state.products[idx] = { ...state.products[idx], name, category, mode, price, cost, imageUrl, deliveryForm };
         }
       } else {
         state.products.push({
@@ -1978,13 +2059,14 @@
           price,
           cost,
           imageUrl,
+          deliveryForm,
           codes: []
         });
       }
       saveState();
       closeModal('productEditorModal');
       renderAll();
-      showToast('💾 บันทึกข้อมูลสินค้าเรียบร้อยแล้ว', 'success');
+      showToast('💾 บันทึกข้อมูลสินค้าและฟอร์มจัดส่งเรียบร้อยแล้ว', 'success');
     }
 
     function deleteProductById(id) {
@@ -2002,7 +2084,7 @@
         return;
       }
       document.getElementById('adminSelectedStockCount').textContent = `${(p.codes || []).length} ชิ้น`;
-      document.getElementById('adminCurrentCodesList').innerHTML = (p.codes || []).map((c, i) => `<div>${i + 1}. ${c}</div>`).join('') || '<div>ยังไม่มีรหัสในสต็อก</div>';
+      document.getElementById('adminCurrentCodesList').innerHTML = (p.codes || []).map((c, i) => `<div>${i + 1}. ${escapeHtml(c)}</div>`).join('') || '<div>ยังไม่มีรหัสในสต็อก</div>';
     }
 
     function generateSampleStockCodes() {
@@ -2032,16 +2114,23 @@
     function fulfillPreorderAndSendEmail(orderId) {
       const code = (document.getElementById(`fulfillCodeInput-${orderId}`)?.value || '').trim();
       if (!code) {
-        showToast('⚠️ กรุณากรอกรหัสสินค้าก่อนกดส่ง', 'warning');
+        showToast('⚠️ กรุณากรอกรหัสสินค้าหรือลิงก์เชิญก่อนกดส่ง', 'warning');
         return;
       }
       const o = state.orders.find(x => x.id === orderId);
       if (!o) return;
+      const prod = state.products.find(p => p.id === o.productId);
+      const customFormVal = document.getElementById(`fulfillFormInput-${orderId}`)?.value;
+
       o.status = 'COMPLETED';
       o.deliveredData = [code];
+      o.fulfilledAt = new Date().toLocaleString('th-TH');
+      o.deliveredFormatted = buildFormattedDeliveryMessage(prod, o, [code], customFormVal);
+
+      sendDeliveryEmailNotification(o);
       saveState();
       renderAll();
-      showToast(`📨 จัดส่งรหัสสำหรับ #${orderId} เรียบร้อยแล้ว`, 'success');
+      showToast(`📨 จัดส่งรหัสพร้อมฟอร์มสำหรับ #${orderId} เข้าอีเมลลูกค้าเรียบร้อยแล้ว`, 'success');
     }
 
     function toggleAdminEmailAlertSetting() {
@@ -2161,19 +2250,17 @@
       updateSecurityVisibility();
 
       document.getElementById('headerUserEmailDisplay').textContent = state.user.email || 'เข้าสู่ระบบ / กรอกอีเมล';
-      document.getElementById('headerPointsDisplay').textContent = `${state.user.points} แต้ม`;
       document.getElementById('headerBalanceDisplay').textContent = `฿${Number(state.user.balance || 0).toFixed(2)}`;
 
       const apiSel = document.getElementById('apiTestProductSelect');
       if (apiSel) {
-        apiSel.innerHTML = state.products.map(p => `<option value="${p.id}">${p.name} (฿${getEffectiveUnitPrice(p)})</option>`).join('')
+        apiSel.innerHTML = state.products.map(p => `<option value="${p.id}">${escapeHtml(p.name)} (฿${getEffectiveUnitPrice(p)})</option>`).join('')
           || `<option value="">ยังไม่มีสินค้าในระบบ</option>`;
       }
 
       renderProductsGrid();
       renderOrdersTab();
       renderRewardsTab();
-      updateRedeemPreview();
       if (state.appMode === 'ADMIN') {
         renderAdminView();
       }
