@@ -10,6 +10,8 @@
 
   <!-- QRCode.js Library for Real Scannable PromptPay QR -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+  <!-- jsQR Library for Instant Client-Side Slip QR Decoding -->
+  <script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.min.js"></script>
 
   <!-- Google Fonts: Prompt & JetBrains Mono -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -56,13 +58,17 @@
     }
     .animate-fade-up { animation: fadeSlideUp 0.25s ease-out forwards; }
 
+    #dynamicQrSvgBox {
+      display: block !important;
+      line-height: 0;
+    }
     #dynamicQrSvgBox img,
     #dynamicQrSvgBox canvas {
       margin: 0 auto;
-      display: block;
       width: 100% !important;
       height: 100% !important;
       object-fit: contain;
+      image-rendering: pixelated;
     }
   </style>
 </head>
@@ -689,10 +695,23 @@
 
           <div class="p-4 rounded-2xl bg-gradient-to-b from-sky-50 to-white border border-sky-200 text-center space-y-2">
             <div class="text-xs font-bold text-sky-800 tracking-wide">THAI QR PAYMENT • พร้อมเพย์แท้</div>
-            <div id="dynamicQrSvgBox" class="w-44 h-44 mx-auto bg-white p-2.5 rounded-xl border border-slate-200 shadow-2xs flex items-center justify-center"></div>
+            <div id="dynamicQrSvgBox" class="w-48 h-48 mx-auto bg-white p-3 rounded-xl border border-slate-200 shadow-2xs"></div>
             <div class="text-sm font-bold theme-text-primary">ยอดโอน: <span id="qrAmountDisplay">฿100.00</span></div>
             <div class="text-[11px] text-slate-500">พร้อมเพย์: <span id="qrPromptPayIdDisplay" class="font-mono-code font-semibold">0863807024</span></div>
             <div class="text-[10px] text-emerald-700 font-medium">✅ สแกนผ่านแอปธนาคารได้ทันที ระบบล็อกยอดอัตโนมัติ</div>
+          </div>
+        </div>
+
+        <div class="md:col-span-6 space-y-4">
+          <div>
+            <label class="block text-xs font-bold text-slate-700 mb-1.5">แนบรูปสลิปโอนเงินจริง</label>
+            <label class="flex flex-col items-center justify-center p-4 rounded-2xl border-2 border-dashed border-pink-300 bg-pink-50/40 hover:bg-pink-50 cursor-pointer transition text-center">
+              <i class="fa-solid fa-cloud-arrow-up text-2xl theme-text-primary mb-1"></i>
+              <span class="text-xs font-bold text-slate-700">คลิกเลือกรูปสลิปโอนเงิน</span>
+              <span class="text-[11px] text-slate-400">อ่าน QR ในสลิป & ตรวจยอดอัตโนมัติ (Slip2Go / EasySlip)</span>
+              <input type="file" accept="image/*" onchange="handleRealSlipFileUpload(event)" class="hidden" />
+            </label>
+            <div id="slipQrScanStatus" class="hidden mt-2 px-3 py-2 rounded-xl text-[11px] font-semibold"></div>
           </div>
         </div>
 
@@ -1726,14 +1745,170 @@
       if (typeof QRCode !== 'undefined') {
         new QRCode(box, {
           text: payload,
-          width: 160,
-          height: 160,
-          colorDark: '#0f172a',
+          width: 240,
+          height: 240,
+          colorDark: '#000000',
           colorLight: '#ffffff',
           correctLevel: QRCode.CorrectLevel.M
         });
+        setTimeout(() => {
+          const img = box.querySelector('img');
+          const canvas = box.querySelector('canvas');
+          if (img && canvas) {
+            canvas.style.display = 'none';
+            img.style.display = 'block';
+          }
+        }, 30);
       } else {
         box.innerHTML = `<div class="text-[10px] text-slate-500 p-2 font-mono-code break-all">${escapeHtml(payload)}</div>`;
+      }
+    }
+
+    function decodeSlipQrAndCompress(file) {
+      return new Promise((resolve, reject) => {
+        const objectUrl = URL.createObjectURL(file);
+        const img = new Image();
+        img.onload = function() {
+          try {
+            const origW = img.naturalWidth || img.width;
+            const origH = img.naturalHeight || img.height;
+
+            // 1. บีบอัดรูปสลิปให้คมชัดและขนาดเหมาะสมสำหรับส่ง API
+            const maxDim = 1280;
+            const scale = Math.min(1, maxDim / Math.max(origW, origH));
+            const compW = Math.max(1, Math.round(origW * scale));
+            const compH = Math.max(1, Math.round(origH * scale));
+
+            const compCanvas = document.createElement('canvas');
+            compCanvas.width = compW;
+            compCanvas.height = compH;
+            const compCtx = compCanvas.getContext('2d');
+            compCtx.fillStyle = '#ffffff';
+            compCtx.fillRect(0, 0, compW, compH);
+            compCtx.drawImage(img, 0, 0, compW, compH);
+            const compressedBase64 = compCanvas.toDataURL('image/jpeg', 0.9);
+
+            // 2. สแกนอ่านรหัส QR Code จากสลิปหลายระยะ (เต็มใบ + โซนล่างขวาที่ธนาคารนิยมวาง QR)
+            let decodedQr = '';
+            if (typeof jsQR === 'function') {
+              const scanRegions = [
+                { sx: 0, sy: 0, sw: origW, sh: origH, targetW: compW, targetH: compH },
+                { sx: 0, sy: 0, sw: origW, sh: origH, targetW: Math.min(origW, 2000), targetH: Math.min(origH, 2000) },
+                { sx: Math.floor(origW * 0.35), sy: Math.floor(origH * 0.45), sw: Math.ceil(origW * 0.65), sh: Math.ceil(origH * 0.55), targetW: 900, targetH: 900 },
+                { sx: 0, sy: Math.floor(origH * 0.45), sw: origW, sh: Math.ceil(origH * 0.55), targetW: 1100, targetH: 900 }
+              ];
+
+              const scanCanvas = document.createElement('canvas');
+              const scanCtx = scanCanvas.getContext('2d', { willReadFrequently: true });
+
+              for (const reg of scanRegions) {
+                if (reg.sw <= 0 || reg.sh <= 0) continue;
+                const ratio = Math.min(1, reg.targetW / reg.sw, reg.targetH / reg.sh);
+                const dw = Math.max(1, Math.round(reg.sw * ratio));
+                const dh = Math.max(1, Math.round(reg.sh * ratio));
+                scanCanvas.width = dw;
+                scanCanvas.height = dh;
+                scanCtx.fillStyle = '#ffffff';
+                scanCtx.fillRect(0, 0, dw, dh);
+                scanCtx.drawImage(img, reg.sx, reg.sy, reg.sw, reg.sh, 0, 0, dw, dh);
+                const imgData = scanCtx.getImageData(0, 0, dw, dh);
+                const qrResult = jsQR(imgData.data, dw, dh, { inversionAttempts: 'attemptBoth' });
+                if (qrResult && qrResult.data) {
+                  decodedQr = qrResult.data.trim();
+                  break;
+                }
+              }
+            }
+
+            URL.revokeObjectURL(objectUrl);
+            resolve({ qrCode: decodedQr, imageBase64: compressedBase64 });
+          } catch (err) {
+            URL.revokeObjectURL(objectUrl);
+            reject(err);
+          }
+        };
+        img.onerror = function() {
+          URL.revokeObjectURL(objectUrl);
+          reject(new Error('ไม่สามารถเปิดไฟล์รูปภาพสลิปได้'));
+        };
+        img.src = objectUrl;
+      });
+    }
+
+    async function handleRealSlipFileUpload(event) {
+      const file = event.target.files?.[0];
+      event.target.value = '';
+      if (!file) return;
+      if (!state.user.email) {
+        showToast('กรุณากรอกอีเมลก่อนแนบสลิป', 'warning');
+        openEmailLoginModal();
+        return;
+      }
+
+      const previewEl = document.getElementById('easySlipJsonPreview');
+      const statusBox = document.getElementById('slipQrScanStatus');
+      if (statusBox) {
+        statusBox.className = 'mt-2 px-3 py-2 rounded-xl text-[11px] font-semibold bg-sky-50 text-sky-700 border border-sky-200';
+        statusBox.textContent = '🔍 กำลังสแกนอ่าน QR Code จากสลิป...';
+      }
+      previewEl.textContent = JSON.stringify({ status: 'scanning_qr_in_slip...', file: file.name }, null, 2);
+
+      try {
+        const { qrCode, imageBase64 } = await decodeSlipQrAndCompress(file);
+
+        if (statusBox) {
+          if (qrCode) {
+            statusBox.className = 'mt-2 px-3 py-2 rounded-xl text-[11px] font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200';
+            statusBox.textContent = '✅ อ่านรหัส QR จากสลิปสำเร็จ! กำลังตรวจสอบยอดเงินกับธนาคาร...';
+          } else {
+            statusBox.className = 'mt-2 px-3 py-2 rounded-xl text-[11px] font-semibold bg-amber-50 text-amber-800 border border-amber-200';
+            statusBox.textContent = '⚠️ กำลังส่งรูปสลิปให้ระบบ AI ตรวจจับ QR Code...';
+          }
+        }
+
+        const res = await fetch(state.settings.slipVerifyEndpoint || '/.netlify/functions/verify-slip', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            qrCode,
+            imageBase64,
+            mimeType: 'image/jpeg',
+            userEmail: state.user.email
+          })
+        });
+        const data = await res.json();
+        previewEl.textContent = JSON.stringify(data, null, 2);
+
+        if (res.ok && data.success) {
+          const added = Number(data.amount || 0);
+          state.user.balance = typeof data.newBalance === 'number'
+            ? data.newBalance
+            : Number(state.user.balance || 0) + added;
+
+          state.slipLogs.unshift({
+            transRef: data.transRef || ('REF-' + Date.now()),
+            userEmail: state.user.email,
+            amount: added,
+            status: 'VERIFIED',
+            createdAt: new Date().toLocaleString('th-TH')
+          });
+          saveState();
+          renderAll();
+          if (statusBox) {
+            statusBox.className = 'mt-2 px-3 py-2 rounded-xl text-[11px] font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200';
+            statusBox.textContent = `🎉 ตรวจสอบสลิปสำเร็จ! เติมเครดิต +฿${added.toFixed(2)} เรียบร้อยแล้ว`;
+          }
+          showToast(`✅ ตรวจสอบสลิปสำเร็จ! เติมเครดิต +฿${added.toFixed(2)} แล้ว`, 'success');
+        } else {
+          if (statusBox) {
+            statusBox.className = 'mt-2 px-3 py-2 rounded-xl text-[11px] font-semibold bg-rose-50 text-rose-700 border border-rose-200';
+            statusBox.textContent = `❌ ${data.error || 'ตรวจสอบสลิปไม่ผ่าน'}`;
+          }
+          showToast(`❌ ${data.error || 'ตรวจสอบสลิปไม่ผ่าน'}`, 'error');
+        }
+      } catch (err) {
+        previewEl.textContent = JSON.stringify({ status: 'error', message: err.message }, null, 2);
+        showToast('❌ ไม่สามารถเชื่อมต่อระบบตรวจสลิปได้', 'error');
       }
     }
 
