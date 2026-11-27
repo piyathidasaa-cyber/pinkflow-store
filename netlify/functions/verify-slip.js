@@ -69,13 +69,16 @@ export async function handler(event) {
         return {
           statusCode: 400,
           body: JSON.stringify({
-            error: `ไม่พบ QR Code ในสลิปหรือสลิปไม่ถูกต้อง (${lastApiMessage || 'กรุณาใช้รูปสลิปต้นฉบับจากแอปธนาคาร'})`,
+            error: `Slip2Go: ไม่พบ QR Code ในสลิปหรือสลิปไม่ถูกต้อง (${lastApiMessage || 'กรุณาใช้รูปสลิปต้นฉบับจากแอปธนาคาร'})`,
           }),
         };
       }
 
       transRef = slip.transRef || slip.referenceId || '';
-      amount = Number(slip.amount || 0);
+      const rawAmount = typeof slip.amount === 'object' && slip.amount !== null
+        ? slip.amount.amount
+        : slip.amount;
+      amount = Number(rawAmount || 0);
       slipTime = new Date(slip.dateTime || slip.date).getTime();
       receiverAccNumbers = JSON.stringify(slip.receiver || '').replace(/\D/g, '');
     }
