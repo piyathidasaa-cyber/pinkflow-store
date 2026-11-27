@@ -21,7 +21,7 @@ export async function handler(event) {
 
     const sbHeaders = {
       apikey: sbKey,
-      Authorization: `Bearer ${sbKey}`,
+      ...(sbKey.startsWith('sb_') ? {} : { Authorization: `Bearer ${sbKey}` }),
       'Content-Type': 'application/json',
       Prefer: 'return=representation',
     };
