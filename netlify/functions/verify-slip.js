@@ -4,11 +4,11 @@ exports.handler = async function (event) {
   }
 
   try {
-    // เช็กเวลาโอนไม่เกิน 60 นาที
-    if (slipTime && !Number.isNaN(slipTime) && (Date.now() - slipTime) / (1000 * 60) > 60) {
+    const { qrCode, imageBase64, mimeType, userEmail } = JSON.parse(event.body || '{}');
+    if ((!qrCode && !imageBase64) || !userEmail) {
       return {
         statusCode: 400,
-        body: JSON.stringify({ error: 'สลิปหมดอายุ (กรุณาใช้สลิปที่โอนภายใน 60 นาทีล่าสุด)' }),
+        body: JSON.stringify({ error: 'กรุณาแนบรูปสลิปและระบุอีเมลก่อนเติมเงิน' }),
       };
     }
 
@@ -136,11 +136,11 @@ exports.handler = async function (event) {
       };
     }
 
-    // เช็กเวลาโอนไม่เกิน 30 นาที
-    if (slipTime && !Number.isNaN(slipTime) && (Date.now() - slipTime) / (1000 * 60) > 30) {
+    // เช็กเวลาโอนไม่เกิน 60 นาที
+    if (slipTime && !Number.isNaN(slipTime) && (Date.now() - slipTime) / (1000 * 60) > 60) {
       return {
         statusCode: 400,
-        body: JSON.stringify({ error: 'สลิปหมดอายุ (กรุณาใช้สลิปที่โอนภายใน 30 นาทีล่าสุด)' }),
+        body: JSON.stringify({ error: 'สลิปหมดอายุ (กรุณาใช้สลิปที่โอนภายใน 60 นาทีล่าสุด)' }),
       };
     }
 
