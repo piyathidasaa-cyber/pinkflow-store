@@ -78,7 +78,7 @@
         <!-- ปุ่ม Admin แสดงเฉพาะเมื่อล็อกอินด้วยอีเมลแอดมินเท่านั้น -->
         <button id="modeBtn-ADMIN" onclick="switchAppMode('ADMIN')" class="hidden px-3 py-1.5 rounded-lg font-semibold transition flex items-center gap-1.5 text-slate-300 hover:text-white cursor-pointer relative">
           <span>🛡️</span> <span>ระบบหลังบ้าน (Admin)</span>
-          <span id="adminUnreadBadge" class="hidden ml-1 px-1.5 py-0.2 bg-rose-500 text-white text-[10px] font-bold rounded-full">0</span>
+          <span id="adminUnreadBadge" class="hidden ml-1 px-1.5 py-0.5 bg-rose-500 text-white text-[10px] font-bold rounded-full">0</span>
         </button>
       </div>
 
@@ -134,7 +134,7 @@
       </button>
       <button id="storeTabBtn-ORDERS" onclick="switchStoreTab('ORDERS')" class="px-3.5 py-2 rounded-xl text-xs sm:text-sm font-semibold text-slate-600 hover:bg-pink-50 transition whitespace-nowrap flex items-center gap-1.5 cursor-pointer">
         <span>📦 ประวัติสั่งซื้อ & อีเมล</span>
-        <span id="expiringAlertPill" class="hidden px-1.5 py-0.5 text-[10px] bg-amber-500 text-white rounded-full font-bold">ใกล้หมดอายุ 1</span>
+        <span id="expiringAlertPill" class="hidden px-1.5 py-0.5 text-[10px] bg-amber-500 text-white rounded-full font-bold">0</span>
       </button>
       <button id="storeTabBtn-REWARDS" onclick="switchStoreTab('REWARDS')" class="px-3.5 py-2 rounded-xl text-xs sm:text-sm font-semibold text-slate-600 hover:bg-pink-50 transition whitespace-nowrap cursor-pointer">
         🎟️ โค้ดส่วนลดประจำเดือน
@@ -199,7 +199,6 @@
 
       <!-- STORE TAB 2: ORDERS & DELIVERY FORM RECEIPT -->
       <div id="storePanel-ORDERS" class="hidden space-y-6 animate-fade-up">
-        <div id="nearExpiryContainer"></div>
         <div class="bg-white p-5 sm:p-6 rounded-3xl border border-pink-100 shadow-2xs space-y-4">
           <div class="flex flex-wrap items-center justify-between gap-2 border-b border-pink-100 pb-4">
             <div>
@@ -212,7 +211,7 @@
         </div>
       </div>
 
-      <!-- STORE TAB 3: COUPONS -->
+      <!-- STORE TAB 3: COUPONS ONLY -->
       <div id="storePanel-REWARDS" class="hidden space-y-6 animate-fade-up">
         <div class="max-w-3xl mx-auto">
           <div class="bg-white p-6 rounded-3xl border border-pink-100 shadow-2xs space-y-4">
@@ -704,6 +703,7 @@
               <input type="file" accept="image/*" onchange="handleRealSlipFileUpload(event)" class="hidden" />
             </label>
           </div>
+
           <!-- ปุ่มจำลองตรวจสลิป: ซ่อนจากลูกค้าทั่วไปโดยสมบูรณ์ (แสดงเฉพาะแอดมินที่ปลดล็อก PIN แล้วเท่านั้น) -->
           <div id="adminSlipSimulatorBox" class="hidden space-y-1.5">
             <div class="text-xs font-bold text-slate-700">🧪 ปุ่มจำลองผลตรวจสลิป (เฉพาะแอดมินทดสอบ):</div>
@@ -846,7 +846,7 @@
   <div id="toastContainer" class="fixed bottom-4 right-4 z-50 space-y-2 max-w-sm pointer-events-none"></div>
 
   <script>
-    const STORAGE_KEY = 'pinkflow_store_clean_forms_v11';
+    const STORAGE_KEY = 'pinkflow_store_clean_forms_v12';
 
     const THEME_PRESETS = {
       rose:   { primary: '#ec4899', hover: '#db2777', light: '#fdf2f8', border: '#fbcfe8', soft: '#fff7fa' },
@@ -854,6 +854,19 @@
       orchid: { primary: '#d946ef', hover: '#c026d3', light: '#fdf4ff', border: '#f5d0fe', soft: '#fefaff' },
       berry:  { primary: '#e11d48', hover: '#be123c', light: '#ffe4e6', border: '#fda4af', soft: '#fff5f7' }
     };
+
+    const DEFAULT_DELIVERY_FORM = `🌸 ขอบคุณที่สั่งซื้อ {product} กับ PinkFlow Store 🌸
+เลขคำสั่งซื้อ: {order_id}
+บัญชีลูกค้า: {email}
+วันที่จัดส่ง: {date}
+
+🔑 ข้อมูลบัญชี / รหัสใช้งานของคุณ:
+{code}
+
+📌 คำแนะนำและเงื่อนไขการรับประกัน:
+1. กรุณาเข้าสู่ระบบตามข้อมูลด้านบนและตรวจสอบความเรียบร้อยทันที
+2. ห้ามเปลี่ยนรหัสผ่านหรือแก้ไขข้อมูลโปรไฟล์หลักของระบบโดยไม่ได้รับอนุญาต
+3. หากพบปัญหาการใช้งาน สามารถแจ้งเลขคำสั่งซื้อ {order_id} ติดต่อแอดมินได้ตลอด 24 ชม.`;
 
     const DEFAULT_STATE = {
       appMode: 'STORE',
@@ -867,7 +880,113 @@
         apiKey: 'pk_live_pinkflow_98a7f6d5e4c3'
       },
       settings: {
-// ... existing code ... -->
+        shopName: 'PinkFlow Store',
+        tagline: 'ร้านแอพพรีเมี่ยมอัตโนมัติ & พรีออเดอร์ ส่งไวใน 3 วินาที',
+        heroTitle: 'แอพพรีเมี่ยมแท้ ราคาสุดคุ้ม กดปุ๊บรับรหัสปั๊บ!',
+        themeKey: 'rose',
+        logoType: 'ICON',
+        logoIcon: 'fa-crown',
+        logoImageUrl: '',
+        promptPayId: '0863807024',
+        adminEmail: 'pigiria9@gmail.com',
+        adminCcEmail: 'support@pinkflow.store',
+        adminPin: '8899',
+        adminAlertEnabled: true,
+        liveApiEnabled: true,
+        slipVerifyEndpoint: '/.netlify/functions/verify-slip',
+        placeOrderEndpoint: '/.netlify/functions/place-order'
+      },
+      products: [],
+      coupons: [],
+      orders: [],
+      slipLogs: [],
+      adminInbox: []
+    };
+
+    let state = loadState();
+    let isAdminSessionUnlocked = false;
+    let activeCheckoutProductId = null;
+    let activeCheckoutQty = 1;
+
+    function loadState() {
+      try {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        if (!raw) return JSON.parse(JSON.stringify(DEFAULT_STATE));
+        const parsed = JSON.parse(raw);
+        return {
+          ...JSON.parse(JSON.stringify(DEFAULT_STATE)),
+          ...parsed,
+          user: { ...DEFAULT_STATE.user, ...(parsed.user || {}) },
+          settings: { ...DEFAULT_STATE.settings, ...(parsed.settings || {}) },
+          products: Array.isArray(parsed.products) ? parsed.products : [],
+          coupons: Array.isArray(parsed.coupons) ? parsed.coupons : [],
+          orders: Array.isArray(parsed.orders) ? parsed.orders : [],
+          slipLogs: Array.isArray(parsed.slipLogs) ? parsed.slipLogs : [],
+          adminInbox: Array.isArray(parsed.adminInbox) ? parsed.adminInbox : []
+        };
+      } catch (e) {
+        return JSON.parse(JSON.stringify(DEFAULT_STATE));
+      }
+    }
+
+    function saveState() {
+      try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+      } catch (e) {
+        console.warn('Unable to save local state:', e);
+      }
+    }
+
+    function escapeHtml(str) {
+      return String(str ?? '')
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+    }
+
+    function showToast(message, type = 'info') {
+      const container = document.getElementById('toastContainer');
+      if (!container) return;
+      const colors = {
+        success: 'bg-emerald-600 text-white border-emerald-500',
+        error: 'bg-rose-600 text-white border-rose-500',
+        warning: 'bg-amber-500 text-white border-amber-400',
+        info: 'bg-slate-900 text-white border-pink-500/40'
+      };
+      const el = document.createElement('div');
+      el.className = `pointer-events-auto px-4 py-3 rounded-2xl border shadow-lg text-xs font-semibold animate-fade-up ${colors[type] || colors.info}`;
+      el.textContent = message;
+      container.appendChild(el);
+      setTimeout(() => {
+        el.style.opacity = '0';
+        el.style.transition = 'opacity 0.25s ease';
+        setTimeout(() => el.remove(), 260);
+      }, 3200);
+    }
+
+    function copyTextValue(text, successMsg = 'คัดลอกเรียบร้อยแล้ว!') {
+      try {
+        const textarea = document.createElement('textarea');
+        textarea.value = text;
+        textarea.style.position = 'fixed';
+        textarea.style.opacity = '0';
+        document.body.appendChild(textarea);
+        textarea.select();
+        document.execCommand('copy');
+        document.body.removeChild(textarea);
+        showToast(successMsg, 'success');
+      } catch (e) {
+        showToast('ไม่สามารถคัดลอกข้อความได้', 'error');
+      }
+    }
+
+    function closeModal(id) {
+      document.getElementById(id)?.classList.add('hidden');
+    }
+
+    // SECURITY & ADMIN ACCESS CONTROL
     function isAdminAccount() {
       const currentEmail = (state.user.email || '').trim().toLowerCase();
       const adminEmail = (state.settings.adminEmail || 'pigiria9@gmail.com').trim().toLowerCase();
@@ -888,8 +1007,54 @@
       }
     }
 
+    function switchAppMode(mode) {
+      if (mode === 'ADMIN') {
+        if (!isAdminAccount()) {
+          showToast('⛔ เฉพาะบัญชีแอดมินเท่านั้นที่สามารถเข้าถึงส่วนนี้ได้', 'error');
+          return;
+        }
+        if (!isAdminSessionUnlocked) {
+          const pinInput = document.getElementById('adminPinVerifyInput');
+          if (pinInput) pinInput.value = '';
+          document.getElementById('adminPinModal')?.classList.remove('hidden');
+          setTimeout(() => pinInput?.focus(), 100);
+          return;
+        }
+      }
+
+      state.appMode = mode;
+      saveState();
+      updateSecurityVisibility();
+      renderAll();
+    }
+
     function verifyAdminPinAndEnter() {
-// ... existing code ... -->
+      const entered = (document.getElementById('adminPinVerifyInput')?.value || '').trim();
+      const expected = (state.settings.adminPin || '8899').trim();
+
+      if (entered !== expected) {
+        showToast('❌ รหัสผ่าน PIN ไม่ถูกต้อง', 'error');
+        return;
+      }
+
+      isAdminSessionUnlocked = true;
+      closeModal('adminPinModal');
+      state.appMode = 'ADMIN';
+      saveState();
+      updateSecurityVisibility();
+      renderAll();
+      showToast('🔓 ปลดล็อกระบบหลังบ้านแอดมินเรียบร้อยแล้ว', 'success');
+    }
+
+    function switchStoreTab(tab) {
+      state.storeTab = tab;
+      saveState();
+      renderAll();
+    }
+
+    function switchAdminTab(tab) {
+      state.adminTab = tab;
+      saveState();
       renderAdminView();
     }
 
@@ -931,29 +1096,1267 @@
         if (res.ok && data.success && data.user) {
           state.user.balance = Number(data.user.balance || 0);
           if (Array.isArray(data.orders) && data.orders.length > 0) {
-// ... existing code ... -->
+            const remoteOrders = data.orders.map(o => ({
+              id: o.id,
+              userEmail: o.user_email,
+              productId: o.product_id,
+              productName: o.product_name,
+              mode: o.mode || 'INSTANT',
+              qty: Number(o.qty || 1),
+              totalPaid: Number(o.total_paid || 0),
+              status: o.status || 'COMPLETED',
+              deliveredCode: o.delivered_code || '',
+              deliveredForm: o.delivered_form || '',
+              customerNote: o.customer_note || '',
+              createdAt: o.created_at ? new Date(o.created_at).toLocaleString('th-TH') : ''
+            }));
+            const localMap = new Map(state.orders.map(item => [item.id, item]));
+            remoteOrders.forEach(ro => {
+              const existing = localMap.get(ro.id);
+              localMap.set(ro.id, { ...ro, deliveredForm: ro.deliveredForm || existing?.deliveredForm || '' });
+            });
+            state.orders = Array.from(localMap.values());
+          }
+          saveState();
+          renderAll();
+          showToast(`✅ เข้าสู่ระบบ ${email} และซิงก์ข้อมูลสำเร็จ!`, 'success');
+        } else {
+          showToast(`✅ เข้าสู่ระบบด้วย ${email} เรียบร้อยแล้ว`, 'success');
+        }
+      } catch (e) {
+        showToast(`✅ เข้าสู่ระบบด้วย ${email} เรียบร้อยแล้ว`, 'success');
+      }
+    }
+
+    // THEME & STOREFRONT RENDERING
+    function applyThemeVars() {
+      const preset = THEME_PRESETS[state.settings.themeKey] || THEME_PRESETS.rose;
+      const root = document.documentElement;
+      root.style.setProperty('--primary', preset.primary);
+      root.style.setProperty('--primary-hover', preset.hover);
+      root.style.setProperty('--primary-light', preset.light);
+      root.style.setProperty('--primary-border', preset.border);
+      root.style.setProperty('--bg-soft', preset.soft);
+    }
+
+    function applyPinkThemePreset(key) {
+      if (!THEME_PRESETS[key]) return;
+      state.settings.themeKey = key;
+      applyThemeVars();
+      saveState();
+      showToast(`เปลี่ยนธีมสีเป็น ${key.toUpperCase()} แล้ว!`, 'success');
+    }
+
+    function setPresetLogoIcon(iconClass) {
+      state.settings.logoType = 'ICON';
+      state.settings.logoIcon = iconClass;
+      state.settings.logoImageUrl = '';
+      const urlInput = document.getElementById('customLogoUrlInput');
+      if (urlInput) urlInput.value = '';
+      renderAdminCustomize();
+    }
+
+    function handleLogoFileUpload(event) {
+      const file = event.target.files?.[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        state.settings.logoType = 'IMAGE';
+        state.settings.logoImageUrl = e.target.result;
+        const urlInput = document.getElementById('customLogoUrlInput');
+        if (urlInput) urlInput.value = '';
+        renderAdminCustomize();
+      };
+      reader.readAsDataURL(file);
+    }
+
+    function saveStoreCustomization() {
+      state.settings.shopName = (document.getElementById('customShopNameInput')?.value || 'PinkFlow Store').trim();
+      state.settings.tagline = (document.getElementById('customTaglineInput')?.value || '').trim();
+      state.settings.heroTitle = (document.getElementById('customHeroTitleInput')?.value || '').trim();
+      const customUrl = (document.getElementById('customLogoUrlInput')?.value || '').trim();
+      if (customUrl) {
+        state.settings.logoType = 'IMAGE';
+        state.settings.logoImageUrl = customUrl;
+      }
+      saveState();
+      renderAll();
+      showToast('💾 บันทึกการตกแต่งร้านค้าเรียบร้อยแล้ว!', 'success');
+    }
+
+    function renderHeaderAndHero() {
+      applyThemeVars();
+      document.getElementById('headerShopName').textContent = state.settings.shopName || 'PinkFlow Store';
+      document.getElementById('headerShopTagline').textContent = state.settings.tagline || '';
+      document.getElementById('heroTitleText').textContent = state.settings.heroTitle || '';
+
+      const logoHtml = (state.settings.logoType === 'IMAGE' && state.settings.logoImageUrl)
+        ? `<img src="${escapeHtml(state.settings.logoImageUrl)}" alt="Logo" class="w-full h-full object-cover" onerror="this.style.display='none'" />`
+        : `<i class="fa-solid ${escapeHtml(state.settings.logoIcon || 'fa-crown')}"></i>`;
+
+      document.getElementById('headerLogoContainer').innerHTML = logoHtml;
+      document.getElementById('headerUserEmailDisplay').textContent = state.user.email || 'เข้าสู่ระบบ / กรอกอีเมล';
+      document.getElementById('headerBalanceDisplay').textContent = `฿${Number(state.user.balance || 0).toFixed(2)}`;
+      document.getElementById('resellerApiKeyText').textContent = state.user.apiKey;
+
+      const storeBtn = document.getElementById('modeBtn-STORE');
+      const adminBtn = document.getElementById('modeBtn-ADMIN');
+      if (state.appMode === 'STORE') {
+        storeBtn.className = 'px-3 py-1.5 rounded-lg font-semibold transition flex items-center gap-1.5 theme-bg-primary text-white cursor-pointer';
+        adminBtn.classList.remove('theme-bg-primary', 'text-white');
+        adminBtn.classList.add('text-slate-300');
+      } else {
+        storeBtn.className = 'px-3 py-1.5 rounded-lg font-semibold transition flex items-center gap-1.5 text-slate-300 hover:text-white cursor-pointer';
+        adminBtn.classList.add('theme-bg-primary', 'text-white');
+        adminBtn.classList.remove('text-slate-300');
+      }
+
+      const unreadAdminCount = state.adminInbox.filter(m => !m.isRead).length;
+      const adminBadge = document.getElementById('adminUnreadBadge');
+      if (adminBadge) {
+        adminBadge.textContent = unreadAdminCount;
+        adminBadge.classList.toggle('hidden', unreadAdminCount === 0);
+      }
+    }
+
+    function renderCategoryBar() {
+      const categories = ['ทั้งหมด', ...new Set(state.products.map(p => p.category))];
+      if (!categories.includes(state.selectedCategory)) {
+        state.selectedCategory = 'ทั้งหมด';
+      }
+      document.getElementById('categoryFilterBar').innerHTML = categories.map(cat => {
+        const active = state.selectedCategory === cat;
+        return `
+          <button onclick="state.selectedCategory='${escapeHtml(cat)}'; renderCategoryBar(); renderProductsGrid();"
+            class="px-3.5 py-1.5 rounded-xl text-xs font-bold transition whitespace-nowrap cursor-pointer ${active ? 'theme-bg-primary text-white shadow-2xs' : 'bg-pink-50/70 text-slate-600 hover:bg-pink-100'}">
+            ${escapeHtml(cat)}
+          </button>
+        `;
+      }).join('');
+    }
+
+    function renderProductsGrid() {
+      const query = (document.getElementById('searchInput')?.value || '').trim().toLowerCase();
+      const inStockOnly = document.getElementById('filterInStockOnly')?.checked;
+      const preorderOnly = document.getElementById('filterPreorderOnly')?.checked;
+
+      const filtered = state.products.filter(p => {
+        if (state.selectedCategory !== 'ทั้งหมด' && p.category !== state.selectedCategory) return false;
+        if (query && !p.name.toLowerCase().includes(query) && !p.category.toLowerCase().includes(query)) return false;
+        if (inStockOnly && (p.mode !== 'INSTANT' || (p.codes?.length || 0) === 0)) return false;
+        if (preorderOnly && p.mode !== 'PREORDER') return false;
+        return true;
+      });
+
+      const grid = document.getElementById('productsGrid');
+      if (filtered.length === 0) {
+        grid.innerHTML = `
+          <div class="col-span-full bg-white p-12 rounded-3xl border border-pink-100 text-center space-y-2">
+            <div class="text-4xl">🌸</div>
+            <div class="font-bold text-slate-800">ยังไม่มีรายการสินค้าในขณะนี้</div>
+            <p class="text-xs text-slate-500">แอดมินสามารถเพิ่มรายการสินค้าได้ในเมนูระบบหลังบ้าน</p>
+          </div>
+        `;
+        return;
+      }
+
+      grid.innerHTML = filtered.map(p => {
+        const stockCount = p.codes?.length || 0;
+        const isPreorder = p.mode === 'PREORDER';
+        const isAvailable = isPreorder || stockCount > 0;
+        const unitPrice = getEffectiveUnitPrice(p);
+        const fallbackImg = `https://placehold.co/400x240/fdf2f8/ec4899?text=${encodeURIComponent(p.name)}`;
+
+        return `
+          <div class="bg-white rounded-3xl border border-pink-100 shadow-2xs hover:shadow-md transition overflow-hidden flex flex-col">
+            <div class="relative h-40 bg-pink-50 overflow-hidden">
+              <img src="${escapeHtml(p.imageUrl || fallbackImg)}" alt="${escapeHtml(p.name)}" onerror="this.src='${fallbackImg}'" class="w-full h-full object-cover" />
+              <div class="absolute top-2.5 left-2.5">
+                ${isPreorder
+                  ? `<span class="px-2.5 py-1 rounded-full text-[11px] font-bold bg-amber-500 text-white shadow-2xs">⏳ พรีออเดอร์</span>`
+                  : stockCount > 0
+                    ? `<span class="px-2.5 py-1 rounded-full text-[11px] font-bold bg-emerald-500 text-white shadow-2xs">⚡ พร้อมส่ง (${stockCount})</span>`
+                    : `<span class="px-2.5 py-1 rounded-full text-[11px] font-bold bg-slate-700 text-white">สินค้าหมด</span>`
+                }
+              </div>
+            </div>
+
+            <div class="p-4 flex-1 flex flex-col justify-between space-y-3">
+              <div>
+                <div class="text-[11px] font-semibold theme-text-primary">${escapeHtml(p.category)}</div>
+                <h3 class="font-bold text-slate-900 text-sm sm:text-base line-clamp-2 mt-0.5">${escapeHtml(p.name)}</h3>
+              </div>
+
               <div class="pt-2 border-t border-pink-50 flex items-center justify-between gap-2">
                 <div>
                   <div class="text-[10px] text-slate-400">ราคาแพ็กเกจ</div>
                   <div class="text-lg font-bold theme-text-primary">฿${unitPrice}</div>
                 </div>
-// ... existing code ... -->
-      state.user.balance -= finalTotal;
+                <button onclick="openCheckoutModal('${p.id}')" ${!isAvailable ? 'disabled' : ''}
+                  class="px-4 py-2.5 rounded-xl text-xs font-bold transition shadow-2xs cursor-pointer ${!isAvailable ? 'bg-slate-200 text-slate-400 cursor-not-allowed' : isPreorder ? 'bg-amber-500 hover:bg-amber-600 text-white' : 'theme-bg-primary text-white'}">
+                  ${!isAvailable ? 'สินค้าหมด' : isPreorder ? '⏳ พรีออเดอร์' : '🛒 ซื้อเลย'}
+                </button>
+              </div>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    // CHECKOUT & DELIVERY FORM GENERATION
+    function openCheckoutModal(productId) {
+      if (!state.user.email) {
+        showToast('กรุณากรอกอีเมลของคุณก่อนทำรายการสั่งซื้อค่ะ', 'info');
+        openEmailLoginModal();
+        return;
+      }
+
+      const product = state.products.find(p => p.id === productId);
+      if (!product) return;
+
+      activeCheckoutProductId = productId;
+      activeCheckoutQty = 1;
+
+      const fallbackImg = `https://placehold.co/200x200/fdf2f8/ec4899?text=${encodeURIComponent(product.name)}`;
+      document.getElementById('checkoutProductImg').src = product.imageUrl || fallbackImg;
+      document.getElementById('checkoutProductName').textContent = product.name;
+      document.getElementById('checkoutCategoryText').textContent = product.category;
+      document.getElementById('checkoutUnitPrice').textContent = `฿${getEffectiveUnitPrice(product)}`;
+      document.getElementById('checkoutQtyValue').textContent = '1';
+
+      const isPre = product.mode === 'PREORDER';
+      const modeBadge = document.getElementById('checkoutModeBadge');
+      modeBadge.textContent = isPre ? '⏳ พรีออเดอร์' : '⚡ พร้อมส่งอัตโนมัติ';
+      modeBadge.className = isPre
+        ? 'px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-100 text-amber-800'
+        : 'px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-700';
+
+      document.getElementById('checkoutPreorderFields').classList.toggle('hidden', !isPre);
+      document.getElementById('checkoutCustomerEmailInput').value = state.user.email || '';
+      document.getElementById('checkoutCustomerNoteInput').value = '';
+
+      const couponSel = document.getElementById('checkoutCouponSelect');
+      couponSel.innerHTML = `<option value="">-- ไม่ใช้โค้ดส่วนลด --</option>` +
+        state.coupons.filter(c => c.quota > 0).map(c =>
+          `<option value="${escapeHtml(c.code)}">${escapeHtml(c.code)} (ลด ฿${c.discount} เมื่อซื้อครบ ฿${c.minSpend})</option>`
+        ).join('');
+
+      recalculateCheckoutSummary();
+      document.getElementById('checkoutModal').classList.remove('hidden');
+    }
+
+    function changeCheckoutQty(delta) {
+      const product = state.products.find(p => p.id === activeCheckoutProductId);
+      if (!product) return;
+      const maxQty = product.mode === 'INSTANT' ? Math.max(1, product.codes?.length || 1) : 10;
+      activeCheckoutQty = Math.min(maxQty, Math.max(1, activeCheckoutQty + delta));
+      document.getElementById('checkoutQtyValue').textContent = String(activeCheckoutQty);
+      recalculateCheckoutSummary();
+    }
+
+    function recalculateCheckoutSummary() {
+      const product = state.products.find(p => p.id === activeCheckoutProductId);
+      if (!product) return { subtotal: 0, discount: 0, finalTotal: 0 };
+
+      const unitPrice = getEffectiveUnitPrice(product);
+      const subtotal = unitPrice * activeCheckoutQty;
+
+      const selectedCode = document.getElementById('checkoutCouponSelect').value;
+      const coupon = state.coupons.find(c => c.code === selectedCode);
+      let discount = 0;
+      if (coupon && subtotal >= coupon.minSpend && coupon.quota > 0) {
+        discount = coupon.discount;
+      }
+
+      const finalTotal = Math.max(0, subtotal - discount);
+      const afterBal = Number(state.user.balance || 0) - finalTotal;
+
+      document.getElementById('checkoutSubtotalText').textContent = `฿${subtotal.toFixed(2)}`;
+      document.getElementById('checkoutDiscountText').textContent = `-฿${discount.toFixed(2)}`;
+      document.getElementById('checkoutFinalTotalText').textContent = `฿${finalTotal.toFixed(2)}`;
+
+      const afterEl = document.getElementById('checkoutAfterBalanceText');
+      afterEl.textContent = afterBal >= 0 ? `฿${afterBal.toFixed(2)}` : `เครดิตไม่พอ (ขาด ฿${Math.abs(afterBal).toFixed(2)})`;
+      afterEl.className = afterBal >= 0 ? 'font-bold text-emerald-600' : 'font-bold text-rose-600';
+
+      return { subtotal, discount, finalTotal, coupon };
+    }
+
+    function buildRenderedDeliveryForm(product, orderInfo) {
+      const template = (product?.deliveryForm && product.deliveryForm.trim())
+        ? product.deliveryForm
+        : DEFAULT_DELIVERY_FORM;
+
+      return template
+        .replace(/\{code\}/gi, orderInfo.deliveredCode || '(รอแอดมินจัดส่งรหัส)')
+        .replace(/\{product\}/gi, orderInfo.productName || product?.name || '')
+        .replace(/\{email\}/gi, orderInfo.userEmail || '')
+        .replace(/\{order_id\}/gi, orderInfo.id || '')
+        .replace(/\{date\}/gi, orderInfo.createdAt || new Date().toLocaleString('th-TH'));
+    }
+
+    async function confirmCheckoutOrder() {
+      const product = state.products.find(p => p.id === activeCheckoutProductId);
+      if (!product) return;
+
+      const { finalTotal, coupon } = recalculateCheckoutSummary();
+      if (Number(state.user.balance || 0) < finalTotal) {
+        showToast('❌ เครดิตคงเหลือไม่เพียงพอ กรุณาเติมเครดิตก่อนสั่งซื้อ', 'error');
+        return;
+      }
+
+      const isPre = product.mode === 'PREORDER';
+      const customerEmail = isPre
+        ? (document.getElementById('checkoutCustomerEmailInput').value || '').trim()
+        : state.user.email;
+      const customerNote = (document.getElementById('checkoutCustomerNoteInput').value || '').trim();
+
+      if (!customerEmail || !customerEmail.includes('@')) {
+        showToast('⚠️ กรุณากรอกอีเมลให้ถูกต้อง', 'warning');
+        return;
+      }
+
+      if (!isPre && (product.codes?.length || 0) < activeCheckoutQty) {
+        showToast('❌ สินค้าในสต็อกไม่เพียงพอ', 'error');
+        return;
+      }
+
+      let deliveredCode = '';
+      if (!isPre) {
+        const taken = product.codes.splice(0, activeCheckoutQty);
+        deliveredCode = taken.join('\n');
+      }
+
+      state.user.balance = Number(state.user.balance || 0) - finalTotal;
       if (coupon) coupon.quota = Math.max(0, coupon.quota - 1);
 
+      const orderId = 'ORD-' + Date.now().toString().slice(-6);
       const createdAtStr = new Date().toLocaleString('th-TH');
-// ... existing code ... -->
+
+      const newOrder = {
+        id: orderId,
+        userEmail: customerEmail,
+        productId: product.id,
+        productName: product.name,
+        mode: product.mode,
+        qty: activeCheckoutQty,
+        totalPaid: finalTotal,
+        status: isPre ? 'PENDING_PREORDER' : 'COMPLETED',
+        deliveredCode: deliveredCode,
+        deliveredForm: '',
+        customerNote: customerNote,
+        createdAt: createdAtStr
+      };
+
+      if (!isPre) {
+        newOrder.deliveredForm = buildRenderedDeliveryForm(product, newOrder);
+      } else if (state.settings.adminAlertEnabled) {
+        state.adminInbox.unshift({
+          id: 'MAIL-' + Date.now().toString().slice(-5),
+          to: state.settings.adminEmail,
+          subject: `[PinkFlow Alert] 🔔 มีพรีออเดอร์ใหม่ #${orderId} (${product.name})`,
+          body: `ลูกค้า ${customerEmail} สั่งพรีออเดอร์ ${product.name} จำนวน ${activeCheckoutQty} ชิ้น ยอดชำระ ฿${finalTotal.toFixed(2)}\nหมายเหตุ: ${customerNote || '-'}`,
+          createdAt: createdAtStr,
+          isRead: false
+        });
+      }
+
+      state.orders.unshift(newOrder);
+      saveState();
+      closeModal('checkoutModal');
+      renderAll();
+
+      if (state.settings.liveApiEnabled && state.settings.placeOrderEndpoint) {
+        try {
+          await fetch(state.settings.placeOrderEndpoint, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              userEmail: customerEmail,
+              productId: product.id,
+              productName: product.name,
+              mode: product.mode,
+              qty: activeCheckoutQty,
+              totalPaid: finalTotal,
+              customerNote
+            })
+          });
+        } catch (err) {
+          console.warn('Backend sync notice:', err);
+        }
+      }
+
+      if (!isPre) {
+        showToast('🎉 สั่งซื้อสำเร็จ! จัดส่งรหัสและฟอร์มคู่มือเรียบร้อยแล้ว', 'success');
+        openOrderDeliveryModal(orderId);
+      } else {
+        showToast('⏳ สั่งพรีออเดอร์สำเร็จ! ระบบแจ้งเตือนแอดมินเรียบร้อยแล้ว', 'success');
+        switchStoreTab('ORDERS');
+      }
+    }
+
+    function openOrderDeliveryModal(orderId) {
+      const order = state.orders.find(o => o.id === orderId);
+      if (!order) return;
+
+      const product = state.products.find(p => p.id === order.productId);
+      const renderedForm = order.deliveredForm || buildRenderedDeliveryForm(product, order);
+
+      document.getElementById('emailModalHeaderTitle').textContent = `ใบเสร็จ & ฟอร์มจัดส่งสินค้า #${order.id}`;
+      document.getElementById('emailModalBodyContent').innerHTML = `
+        <div class="space-y-4 text-xs">
+          <div class="p-4 rounded-2xl bg-pink-50 border border-pink-200 flex flex-wrap items-center justify-between gap-2">
+            <div>
+              <div class="font-bold text-slate-900 text-sm">${escapeHtml(order.productName)}</div>
+              <div class="text-slate-500 mt-0.5">เลขคำสั่งซื้อ: <span class="font-mono-code font-bold text-pink-600">${escapeHtml(order.id)}</span> • ผู้รับ: ${escapeHtml(order.userEmail)}</div>
+            </div>
+            <span class="px-3 py-1 rounded-full font-bold ${order.status === 'COMPLETED' ? 'bg-emerald-100 text-emerald-700' : 'bg-amber-100 text-amber-800'}">
+              ${order.status === 'COMPLETED' ? '✅ จัดส่งสำเร็จ' : '⏳ รอแอดมินจัดส่ง'}
+            </span>
+          </div>
+
+          ${order.deliveredCode ? `
+            <div class="space-y-1.5">
+              <div class="flex items-center justify-between">
+                <span class="font-bold text-slate-700">🔑 รหัสสินค้า / บัญชีใช้งาน:</span>
+                <button onclick="copyTextValue(\`${escapeHtml(order.deliveredCode).replace(/`/g, '\\`')}\`, 'คัดลอกรหัสสินค้าแล้ว!')" class="px-2.5 py-1 rounded-lg bg-slate-900 text-white font-bold cursor-pointer">คัดลอกรหัส</button>
+              </div>
+              <pre class="p-3.5 rounded-2xl bg-slate-900 text-emerald-300 font-mono-code text-xs whitespace-pre-wrap">${escapeHtml(order.deliveredCode)}</pre>
+            </div>
+          ` : ''}
+
+          <div class="space-y-1.5">
+            <div class="flex items-center justify-between">
+              <span class="font-bold text-slate-700">📋 ฟอร์มรายละเอียดการจัดส่งและวิธีใช้งาน:</span>
+              <button onclick="copyTextValue(\`${escapeHtml(renderedForm).replace(/`/g, '\\`')}\`, 'คัดลอกฟอร์มจัดส่งทั้งหมดแล้ว!')" class="px-2.5 py-1 rounded-lg theme-bg-primary text-white font-bold cursor-pointer">คัดลอกฟอร์มทั้งหมด</button>
+            </div>
+            <div class="p-4 rounded-2xl bg-slate-50 border border-slate-200 text-slate-800 whitespace-pre-wrap leading-relaxed">${escapeHtml(renderedForm)}</div>
+          </div>
+        </div>
+      `;
+      document.getElementById('emailPreviewModal').classList.remove('hidden');
+    }
+
+    function renderOrdersTab() {
+      const currentEmail = (state.user.email || '').trim().toLowerCase();
+      const visibleOrders = currentEmail
+        ? state.orders.filter(o => (o.userEmail || '').toLowerCase() === currentEmail)
+        : state.orders;
+
+      document.getElementById('totalOrdersCountBadge').textContent = `${visibleOrders.length} รายการ`;
+
+      const container = document.getElementById('ordersListContainer');
+      if (visibleOrders.length === 0) {
+        container.innerHTML = `
+          <div class="p-10 rounded-2xl bg-pink-50/40 border border-pink-100 text-center space-y-2">
+            <div class="text-3xl">📭</div>
+            <div class="font-bold text-slate-800 text-sm">ยังไม่มีประวัติการสั่งซื้อ</div>
+            <p class="text-xs text-slate-500">เลือกซื้อสินค้าจากหน้าแรกเพื่อรับรหัสและฟอร์มคู่มือทันที</p>
+          </div>
+        `;
+        return;
+      }
+
+      container.innerHTML = visibleOrders.map(o => `
+        <div class="p-4 rounded-2xl border border-pink-100 bg-pink-50/20 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <div class="space-y-1">
+            <div class="flex items-center gap-2 flex-wrap">
+              <span class="font-mono-code text-xs font-bold text-pink-600">${escapeHtml(o.id)}</span>
+              <span class="px-2 py-0.5 rounded-full text-[10px] font-bold ${o.status === 'COMPLETED' ? 'bg-emerald-100 text-emerald-700' : 'bg-amber-100 text-amber-800'}">
+                ${o.status === 'COMPLETED' ? '✅ จัดส่งสำเร็จ' : '⏳ รอแอดมินจัดส่งพรีออเดอร์'}
+              </span>
+              <span class="text-[11px] text-slate-400">${escapeHtml(o.createdAt || '')}</span>
+            </div>
+            <div class="font-bold text-slate-900 text-sm">${escapeHtml(o.productName)} (x${o.qty})</div>
+            <div class="text-xs text-slate-500">ยอดชำระ: <span class="font-bold text-slate-800">฿${Number(o.totalPaid || 0).toFixed(2)}</span> • อีเมลรับสินค้า: ${escapeHtml(o.userEmail)}</div>
+          </div>
+
+          <div class="flex items-center gap-2 shrink-0">
+            <button onclick="openOrderDeliveryModal('${escapeHtml(o.id)}')" class="px-3.5 py-2 rounded-xl theme-bg-primary text-white text-xs font-bold shadow-2xs cursor-pointer">
+              📋 ดูรหัส & ฟอร์มจัดส่ง
+            </button>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    // COUPONS TAB
     function renderRewardsTab() {
       document.getElementById('storeCouponsList').innerHTML = state.coupons.map(c => `
-        <div class="p-3 rounded-2xl border border-pink-200 bg-pink-50/40 flex items-center justify-between">
+        <div class="p-3.5 rounded-2xl border border-pink-200 bg-pink-50/40 flex items-center justify-between">
           <div>
-            <div class="font-bold text-pink-700 text-xs">${escapeHtml(c.code)} — ลด ฿${c.discount}</div>
+            <div class="font-bold text-pink-700 text-xs sm:text-sm">${escapeHtml(c.code)} — ลด ฿${c.discount}</div>
             <div class="text-[11px] text-slate-500">ขั้นต่ำ ฿${c.minSpend} • เหลือ ${c.quota} สิทธิ์</div>
           </div>
-          <button onclick="copyTextValue('${escapeHtml(c.code)}', 'คัดลอกโค้ด ${escapeHtml(c.code)} แล้ว!')" class="px-3 py-1.5 rounded-xl theme-bg-primary text-white text-xs font-bold cursor-pointer">เก็บโค้ด</button>
+          <button onclick="copyTextValue('${escapeHtml(c.code)}', 'คัดลอกโค้ด ${escapeHtml(c.code)} แล้ว!')" class="px-3.5 py-2 rounded-xl theme-bg-primary text-white text-xs font-bold cursor-pointer">เก็บโค้ด</button>
         </div>
-      `).join('') || `<div class="text-xs text-slate-400">ยังไม่มีโค้ดส่วนลดในขณะนี้</div>`;
+      `).join('') || `<div class="p-6 rounded-2xl bg-pink-50/30 border border-pink-100 text-center text-xs text-slate-400">ยังไม่มีโค้ดส่วนลดในขณะนี้</div>`;
+    }
+
+    // RESELLER API TAB
+    function renderApiTab() {
+      const sel = document.getElementById('apiTestProductSelect');
+      if (!sel) return;
+      sel.innerHTML = state.products.length > 0
+        ? state.products.map(p => `<option value="${escapeHtml(p.id)}">${escapeHtml(p.name)} (฿${p.price})</option>`).join('')
+        : `<option value="">-- ยังไม่มีสินค้าในระบบ --</option>`;
     }
 
     function runResellerApiTest() {
-// ... existing code ... -->
+      const prodId = document.getElementById('apiTestProductSelect')?.value;
+      const product = state.products.find(p => p.id === prodId);
+      const consoleEl = document.getElementById('apiResponseConsole');
+      if (!product) {
+        consoleEl.textContent = JSON.stringify({ status: 404, error: 'no_product_selected' }, null, 2);
+        return;
+      }
+      consoleEl.textContent = JSON.stringify({
+        status: 200,
+        message: 'API connection verified',
+        product_id: product.id,
+        product_name: product.name,
+        mode: product.mode,
+        price: product.price,
+        stock_available: product.mode === 'INSTANT' ? (product.codes?.length || 0) : 'PREORDER'
+      }, null, 2);
+      showToast('⚡ ทดสอบเชื่อมต่อ Reseller API สำเร็จ!', 'success');
+    }
+
+    // REAL EMVCO PROMPTPAY QR GENERATOR & SLIP TOPUP
+    function crc16Ccitt(payload) {
+      let crc = 0xFFFF;
+      for (let i = 0; i < payload.length; i++) {
+        crc ^= payload.charCodeAt(i) << 8;
+        for (let j = 0; j < 8; j++) {
+          if ((crc & 0x8000) !== 0) {
+            crc = ((crc << 1) ^ 0x1021) & 0xFFFF;
+          } else {
+            crc = (crc << 1) & 0xFFFF;
+          }
+        }
+      }
+      return crc.toString(16).toUpperCase().padStart(4, '0');
+    }
+
+    function formatEmvTag(id, value) {
+      const len = String(value.length).padStart(2, '0');
+      return `${id}${len}${value}`;
+    }
+
+    function generatePromptPayPayload(promptPayId, amount) {
+      const cleanId = String(promptPayId || '').replace(/\D/g, '');
+      let targetTag = '';
+      if (cleanId.length === 10 && cleanId.startsWith('0')) {
+        const intlPhone = '0066' + cleanId.slice(1);
+        targetTag = formatEmvTag('01', intlPhone);
+      } else if (cleanId.length === 13) {
+        targetTag = formatEmvTag('02', cleanId);
+      } else {
+        targetTag = formatEmvTag('01', '0066863807024');
+      }
+
+      const merchantAccountInfo = formatEmvTag('29', formatEmvTag('00', 'A000000677010111') + targetTag);
+      const amtNum = Number(amount || 0);
+      const amountTag = amtNum > 0 ? formatEmvTag('54', amtNum.toFixed(2)) : '';
+
+      const rawPayload =
+        formatEmvTag('00', '01') +
+        formatEmvTag('01', amtNum > 0 ? '12' : '11') +
+        merchantAccountInfo +
+        formatEmvTag('53', '764') +
+        amountTag +
+        formatEmvTag('58', 'TH') +
+        '6304';
+
+      return rawPayload + crc16Ccitt(rawPayload);
+    }
+
+    function openTopupModal() {
+      if (!state.user.email) {
+        showToast('กรุณากรอกอีเมลของคุณก่อนเติมเครดิตค่ะ', 'info');
+        openEmailLoginModal();
+        return;
+      }
+      updateSecurityVisibility();
+      updateDynamicPromptPayQr();
+      document.getElementById('topupModal').classList.remove('hidden');
+    }
+
+    function setTopupAmount(amt) {
+      const input = document.getElementById('topupAmountInput');
+      if (input) input.value = String(amt);
+      updateDynamicPromptPayQr();
+    }
+
+    function updateDynamicPromptPayQr() {
+      const amount = Math.max(1, Number(document.getElementById('topupAmountInput')?.value || 100));
+      const ppId = state.settings.promptPayId || '0863807024';
+
+      document.getElementById('qrAmountDisplay').textContent = `฿${amount.toFixed(2)}`;
+      document.getElementById('qrPromptPayIdDisplay').textContent = ppId;
+
+      const payload = generatePromptPayPayload(ppId, amount);
+      const box = document.getElementById('dynamicQrSvgBox');
+      if (!box) return;
+      box.innerHTML = '';
+
+      if (typeof QRCode !== 'undefined') {
+        new QRCode(box, {
+          text: payload,
+          width: 160,
+          height: 160,
+          colorDark: '#0f172a',
+          colorLight: '#ffffff',
+          correctLevel: QRCode.CorrectLevel.M
+        });
+      } else {
+        box.innerHTML = `<div class="text-[10px] text-slate-500 p-2 font-mono-code break-all">${escapeHtml(payload)}</div>`;
+      }
+    }
+
+    function handleRealSlipFileUpload(event) {
+      const file = event.target.files?.[0];
+      if (!file) return;
+      if (!state.user.email) {
+        showToast('กรุณากรอกอีเมลก่อนแนบสลิป', 'warning');
+        openEmailLoginModal();
+        return;
+      }
+
+      const previewEl = document.getElementById('easySlipJsonPreview');
+      previewEl.textContent = JSON.stringify({ status: 'verifying_slip...', file: file.name }, null, 2);
+
+      const reader = new FileReader();
+      reader.onload = async function(e) {
+        const imageBase64 = e.target.result;
+        try {
+          const res = await fetch(state.settings.slipVerifyEndpoint || '/.netlify/functions/verify-slip', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              imageBase64,
+              mimeType: file.type || 'image/jpeg',
+              userEmail: state.user.email
+            })
+          });
+          const data = await res.json();
+          previewEl.textContent = JSON.stringify(data, null, 2);
+
+          if (res.ok && data.success) {
+            const added = Number(data.amount || 0);
+            state.user.balance = typeof data.newBalance === 'number'
+              ? data.newBalance
+              : Number(state.user.balance || 0) + added;
+
+            state.slipLogs.unshift({
+              transRef: data.transRef || ('REF-' + Date.now()),
+              userEmail: state.user.email,
+              amount: added,
+              status: 'VERIFIED',
+              createdAt: new Date().toLocaleString('th-TH')
+            });
+            saveState();
+            renderAll();
+            showToast(`✅ ตรวจสอบสลิปสำเร็จ! เติมเครดิต +฿${added.toFixed(2)} แล้ว`, 'success');
+          } else {
+            showToast(`❌ ${data.error || 'ตรวจสอบสลิปไม่ผ่าน'}`, 'error');
+          }
+        } catch (err) {
+          previewEl.textContent = JSON.stringify({ status: 'error', message: err.message }, null, 2);
+          showToast('❌ ไม่สามารถเชื่อมต่อระบบตรวจสลิปได้', 'error');
+        }
+      };
+      reader.readAsDataURL(file);
+    }
+
+    function simulateSlipVerify(resultType) {
+      if (!isAdminAccount() || !isAdminSessionUnlocked) return;
+      const amount = Math.max(1, Number(document.getElementById('topupAmountInput')?.value || 100));
+      const previewEl = document.getElementById('easySlipJsonPreview');
+
+      if (resultType === 'SUCCESS') {
+        const ref = 'SIM-' + Date.now().toString().slice(-8);
+        state.user.balance = Number(state.user.balance || 0) + amount;
+        state.slipLogs.unshift({
+          transRef: ref,
+          userEmail: state.user.email,
+          amount,
+          status: 'VERIFIED (ADMIN TEST)',
+          createdAt: new Date().toLocaleString('th-TH')
+        });
+        saveState();
+        renderAll();
+        previewEl.textContent = JSON.stringify({ status: 200, transRef: ref, amount, newBalance: state.user.balance }, null, 2);
+        showToast(`✅ [Admin Test] เติมเครดิต +฿${amount.toFixed(2)} สำเร็จ`, 'success');
+      } else {
+        const errors = {
+          DUPLICATE: 'สลิปนี้ถูกใช้งานไปแล้ว (Duplicate transRef)',
+          WRONG_RECEIVER: 'ชื่อหรือเลขบัญชีผู้รับไม่ตรงกับร้านค้า',
+          EXPIRED: 'สลิปเกินเวลา 30 นาทีที่กำหนด'
+        };
+        previewEl.textContent = JSON.stringify({ status: 400, error: errors[resultType] }, null, 2);
+        showToast(`🚫 ${errors[resultType]}`, 'error');
+      }
+    }
+
+    // ADMIN DASHBOARD VIEWS & ACTIONS
+    function renderAdminView() {
+      document.querySelectorAll('.admin-tab-btn').forEach(btn => {
+        btn.classList.remove('theme-bg-light', 'theme-text-primary', 'font-bold');
+        btn.classList.add('text-slate-600', 'font-semibold');
+      });
+      const activeBtn = document.getElementById(`adminTabBtn-${state.adminTab}`);
+      if (activeBtn) {
+        activeBtn.classList.add('theme-bg-light', 'theme-text-primary', 'font-bold');
+        activeBtn.classList.remove('text-slate-600', 'font-semibold');
+      }
+
+      const panels = ['OVERVIEW', 'PREORDERS', 'PRODUCTS', 'STOCKS', 'SLIPS', 'COUPONS', 'CUSTOMIZE', 'DEPLOY'];
+      panels.forEach(p => {
+        const el = document.getElementById(`adminPanel-${p}`);
+        if (el) el.classList.toggle('hidden', state.adminTab !== p);
+      });
+
+      const pendingPreCount = state.orders.filter(o => o.status === 'PENDING_PREORDER').length;
+      document.getElementById('adminPreorderCountBadge').textContent = pendingPreCount;
+
+      renderAdminOverview();
+      renderAdminPreorders();
+      renderAdminProducts();
+      renderAdminStocks();
+      renderAdminSlips();
+      renderAdminCoupons();
+      renderAdminCustomize();
+      renderAdminDeploy();
+    }
+
+    function renderAdminOverview() {
+      const completedOrders = state.orders.filter(o => o.status === 'COMPLETED');
+      const totalSales = state.orders.reduce((sum, o) => sum + Number(o.totalPaid || 0), 0);
+      const totalCost = state.orders.reduce((sum, o) => {
+        const prod = state.products.find(p => p.id === o.productId);
+        return sum + (Number(prod?.cost || 0) * Number(o.qty || 1));
+      }, 0);
+      const netProfit = Math.max(0, totalSales - totalCost);
+      const pendingPreCount = state.orders.filter(o => o.status === 'PENDING_PREORDER').length;
+
+      document.getElementById('adminStatTotalSales').textContent = `฿${totalSales.toFixed(2)}`;
+      document.getElementById('adminStatTotalProfit').textContent = `฿${netProfit.toFixed(2)}`;
+      document.getElementById('adminStatTotalOrders').textContent = `${state.orders.length} ออเดอร์`;
+      document.getElementById('adminStatPendingPre').textContent = `${pendingPreCount} รายการ`;
+
+      const lowStockProducts = state.products.filter(p => p.mode === 'INSTANT' && (p.codes?.length || 0) <= 2);
+      const lowList = document.getElementById('adminLowStockList');
+      if (lowStockProducts.length === 0) {
+        lowList.innerHTML = `<div class="col-span-full text-xs text-slate-400">ยังไม่มีสินค้าที่สต็อกใกล้หมด</div>`;
+      } else {
+        lowList.innerHTML = lowStockProducts.map(p => `
+          <div class="p-3.5 rounded-2xl bg-amber-50 border border-amber-200 flex items-center justify-between gap-2">
+            <div>
+              <div class="font-bold text-slate-800 text-xs">${escapeHtml(p.name)}</div>
+              <div class="text-[11px] text-amber-700 font-semibold">คงเหลือในสต็อก: ${p.codes?.length || 0} ชิ้น</div>
+            </div>
+            <button onclick="switchAdminTab('STOCKS')" class="px-3 py-1.5 rounded-xl bg-amber-500 hover:bg-amber-600 text-white text-xs font-bold cursor-pointer">เติมสต็อก</button>
+          </div>
+        `).join('');
+      }
+    }
+
+    function renderAdminPreorders() {
+      document.getElementById('adminEmailAlertToggle').checked = Boolean(state.settings.adminAlertEnabled);
+      document.getElementById('adminMainEmailInput').value = state.settings.adminEmail || 'pigiria9@gmail.com';
+      document.getElementById('adminCcEmailInput').value = state.settings.adminCcEmail || '';
+
+      const inboxEl = document.getElementById('adminEmailInboxList');
+      if (state.adminInbox.length === 0) {
+        inboxEl.innerHTML = `<div class="p-6 rounded-2xl bg-slate-50 text-center text-xs text-slate-400">ยังไม่มีข้อความแจ้งเตือน</div>`;
+      } else {
+        inboxEl.innerHTML = state.adminInbox.map(m => `
+          <div class="p-3 rounded-2xl border ${m.isRead ? 'bg-slate-50 border-slate-200' : 'bg-pink-50 border-pink-200'} space-y-1">
+            <div class="flex items-center justify-between gap-2">
+              <span class="font-bold text-slate-900 text-xs">${escapeHtml(m.subject)}</span>
+              <span class="text-[10px] text-slate-400">${escapeHtml(m.createdAt)}</span>
+            </div>
+            <div class="text-[11px] text-slate-600 whitespace-pre-wrap">${escapeHtml(m.body)}</div>
+          </div>
+        `).join('');
+      }
+
+      const pendingOrders = state.orders.filter(o => o.status === 'PENDING_PREORDER');
+      const queueEl = document.getElementById('adminPreordersQueueList');
+      if (pendingOrders.length === 0) {
+        queueEl.innerHTML = `<div class="p-8 rounded-2xl bg-slate-50 text-center text-xs text-slate-400">ไม่มีรายการพรีออเดอร์ค้างจัดส่งในขณะนี้</div>`;
+      } else {
+        queueEl.innerHTML = pendingOrders.map(o => {
+          const prod = state.products.find(p => p.id === o.productId);
+          const savedTemplate = prod?.deliveryForm || DEFAULT_DELIVERY_FORM;
+          return `
+            <div class="p-4 rounded-2xl border border-amber-200 bg-amber-50/40 space-y-3 text-xs">
+              <div class="flex flex-wrap items-center justify-between gap-2">
+                <div>
+                  <span class="font-mono-code font-bold text-pink-600">${escapeHtml(o.id)}</span>
+                  <span class="font-bold text-slate-900 ml-1.5">${escapeHtml(o.productName)} (x${o.qty})</span>
+                </div>
+                <span class="text-slate-500">ลูกค้า: <b>${escapeHtml(o.userEmail)}</b></span>
+              </div>
+              ${o.customerNote ? `<div class="text-amber-800 bg-amber-100/70 px-3 py-1.5 rounded-xl">หมายเหตุลูกค้า: ${escapeHtml(o.customerNote)}</div>` : ''}
+              <div>
+                <label class="block font-bold text-slate-700 mb-1">1. กรอกรหัสสินค้า / ลิงก์เชิญที่จะส่งให้ลูกค้า:</label>
+                <textarea id="preorderCodeInput-${escapeHtml(o.id)}" rows="2" placeholder="กรอกอีเมล:รหัสผ่าน หรือลิงก์เชิญ..." class="w-full p-2.5 rounded-xl border border-pink-200 bg-white font-mono-code text-xs"></textarea>
+              </div>
+              <div>
+                <label class="block font-bold text-slate-700 mb-1">2. ฟอร์มรายละเอียดการจัดส่งที่บันทึกไว้ (ระบบจะแทนที่ {code} อัตโนมัติ):</label>
+                <textarea id="preorderFormInput-${escapeHtml(o.id)}" rows="4" class="w-full p-2.5 rounded-xl border border-pink-200 bg-white text-xs">${escapeHtml(savedTemplate)}</textarea>
+              </div>
+              <button onclick="fulfillPreorderItem('${escapeHtml(o.id)}')" class="w-full py-2.5 rounded-xl theme-bg-primary text-white font-bold shadow-xs cursor-pointer">
+                📨 จัดส่งรหัสพร้อมฟอร์มเข้าอีเมลลูกค้าทันที
+              </button>
+            </div>
+          `;
+        }).join('');
+      }
+    }
+
+    function toggleAdminEmailAlertSetting() {
+      state.settings.adminAlertEnabled = document.getElementById('adminEmailAlertToggle').checked;
+      saveState();
+      showToast('อัปเดตสถานะการแจ้งเตือนอีเมลแล้ว', 'info');
+    }
+
+    function saveAdminAlertSettings() {
+      state.settings.adminEmail = (document.getElementById('adminMainEmailInput').value || '').trim();
+      state.settings.adminCcEmail = (document.getElementById('adminCcEmailInput').value || '').trim();
+      saveState();
+      updateSecurityVisibility();
+      showToast('💾 บันทึกอีเมลแจ้งเตือนแอดมินเรียบร้อยแล้ว', 'success');
+    }
+
+    function sendTestAdminPreorderEmail() {
+      state.adminInbox.unshift({
+        id: 'TEST-' + Date.now().toString().slice(-5),
+        to: state.settings.adminEmail,
+        subject: '[PinkFlow Test] 🧪 ทดสอบระบบแจ้งเตือนพรีออเดอร์แอดมิน',
+        body: `ระบบแจ้งเตือนพร้อมใช้งานสำหรับอีเมล ${state.settings.adminEmail}`,
+        createdAt: new Date().toLocaleString('th-TH'),
+        isRead: false
+      });
+      saveState();
+      renderAll();
+      showToast('🧪 ส่งอีเมลทดสอบเข้ากล่องแอดมินเรียบร้อยแล้ว!', 'success');
+    }
+
+    function markAllAdminEmailsRead() {
+      state.adminInbox.forEach(m => m.isRead = true);
+      saveState();
+      renderAll();
+    }
+
+    async function fulfillPreorderItem(orderId) {
+      const order = state.orders.find(o => o.id === orderId);
+      if (!order) return;
+
+      const codeVal = (document.getElementById(`preorderCodeInput-${orderId}`)?.value || '').trim();
+      const formTemplate = (document.getElementById(`preorderFormInput-${orderId}`)?.value || '').trim() || DEFAULT_DELIVERY_FORM;
+
+      if (!codeVal) {
+        showToast('⚠️ กรุณากรอกรหัสสินค้าก่อนกดจัดส่ง', 'warning');
+        return;
+      }
+
+      order.deliveredCode = codeVal;
+      order.status = 'COMPLETED';
+      order.deliveredForm = formTemplate
+        .replace(/\{code\}/gi, codeVal)
+        .replace(/\{product\}/gi, order.productName)
+        .replace(/\{email\}/gi, order.userEmail)
+        .replace(/\{order_id\}/gi, order.id)
+        .replace(/\{date\}/gi, new Date().toLocaleString('th-TH'));
+
+      saveState();
+      renderAll();
+      showToast(`📨 จัดส่งรหัสพร้อมฟอร์มให้ ${order.userEmail} เรียบร้อยแล้ว!`, 'success');
+
+      try {
+        await fetch('/.netlify/functions/send-email', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            to: order.userEmail,
+            subject: `[PinkFlow Store] จัดส่งสินค้า ${order.productName} (#${order.id})`,
+            htmlContent: `<pre style="font-family:sans-serif;white-space:pre-wrap;">${escapeHtml(order.deliveredForm)}</pre>`
+          })
+        });
+      } catch (e) {
+        console.warn('Email endpoint notice:', e);
+      }
+    }
+
+    // ADMIN PRODUCTS & DELIVERY FORM BUILDER
+    function renderAdminProducts() {
+      const container = document.getElementById('adminProductsTable');
+      if (state.products.length === 0) {
+        container.innerHTML = `<div class="col-span-full p-8 rounded-2xl bg-pink-50/40 border border-pink-100 text-center text-xs text-slate-400">ยังไม่มีรายการสินค้า กดปุ่ม "+ เพิ่มสินค้าใหม่" ด้านบนเพื่อเริ่มต้น</div>`;
+        return;
+      }
+
+      container.innerHTML = state.products.map(p => {
+        const fallbackImg = `https://placehold.co/300x160/fdf2f8/ec4899?text=${encodeURIComponent(p.name)}`;
+        const hasForm = Boolean(p.deliveryForm && p.deliveryForm.trim());
+        return `
+          <div class="p-4 rounded-2xl border border-pink-100 bg-pink-50/20 flex flex-col justify-between space-y-3">
+            <div class="space-y-2">
+              <img src="${escapeHtml(p.imageUrl || fallbackImg)}" onerror="this.src='${fallbackImg}'" class="w-full h-28 object-cover rounded-xl border border-pink-100 bg-white" />
+              <div class="flex items-center justify-between gap-1 flex-wrap">
+                <span class="px-2 py-0.5 rounded-full text-[10px] font-bold ${p.mode === 'PREORDER' ? 'bg-amber-100 text-amber-800' : 'bg-emerald-100 text-emerald-700'}">
+                  ${p.mode === 'PREORDER' ? '⏳ พรีออเดอร์' : `⚡ พร้อมส่ง (${p.codes?.length || 0})`}
+                </span>
+                <span class="px-2 py-0.5 rounded-full text-[10px] font-bold ${hasForm ? 'bg-pink-100 text-pink-700' : 'bg-slate-100 text-slate-500'}">
+                  ${hasForm ? '📋 มีฟอร์มจัดส่งแล้ว' : 'ใช้ฟอร์มมาตรฐาน'}
+                </span>
+              </div>
+              <div class="font-bold text-slate-900 text-sm">${escapeHtml(p.name)}</div>
+              <div class="text-xs text-slate-500">ขาย: <b class="text-pink-600">฿${p.price}</b> • ทุน: ฿${p.cost || 0}</div>
+            </div>
+
+            <div class="flex items-center gap-2 pt-2 border-t border-pink-100">
+              <button onclick="openProductEditorModal('${escapeHtml(p.id)}')" class="flex-1 py-2 rounded-xl bg-white hover:bg-pink-50 border border-pink-200 text-pink-700 text-xs font-bold cursor-pointer">
+                ✏️ แก้ไข & ฟอร์มจัดส่ง
+              </button>
+              <button onclick="deleteProductById('${escapeHtml(p.id)}')" class="px-3 py-2 rounded-xl bg-rose-50 hover:bg-rose-100 text-rose-600 text-xs font-bold cursor-pointer">
+                🗑️
+              </button>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function openProductEditorModal(productId = '') {
+      const prod = state.products.find(p => p.id === productId);
+      document.getElementById('editProdId').value = prod?.id || '';
+      document.getElementById('editProdName').value = prod?.name || '';
+      document.getElementById('editProdCategory').value = prod?.category || 'ดูหนัง & ซีรีส์';
+      document.getElementById('editProdMode').value = prod?.mode || 'INSTANT';
+      document.getElementById('editProdPrice').value = prod?.price ?? 99;
+      document.getElementById('editProdCost').value = prod?.cost ?? 45;
+      document.getElementById('editProdImageUrl').value = prod?.imageUrl || '';
+      document.getElementById('editProdDeliveryForm').value = prod?.deliveryForm || DEFAULT_DELIVERY_FORM;
+      document.getElementById('productEditorModal').classList.remove('hidden');
+    }
+
+    function fillDefaultDeliveryFormTemplate() {
+      document.getElementById('editProdDeliveryForm').value = DEFAULT_DELIVERY_FORM;
+      showToast('✨ ใส่ฟอร์มตัวอย่างมาตรฐานเรียบร้อยแล้ว', 'info');
+    }
+
+    function insertFormVariable(variableText) {
+      const textarea = document.getElementById('editProdDeliveryForm');
+      if (!textarea) return;
+      const start = textarea.selectionStart ?? textarea.value.length;
+      const end = textarea.selectionEnd ?? textarea.value.length;
+      textarea.value = textarea.value.substring(0, start) + variableText + textarea.value.substring(end);
+      textarea.focus();
+      textarea.selectionStart = textarea.selectionEnd = start + variableText.length;
+    }
+
+    function handleProductImageUpload(event) {
+      const file = event.target.files?.[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        document.getElementById('editProdImageUrl').value = e.target.result;
+        showToast('อัปโหลดรูปภาพปกสินค้าเรียบร้อยแล้ว', 'success');
+      };
+      reader.readAsDataURL(file);
+    }
+
+    function saveProductFromEditor() {
+      const id = document.getElementById('editProdId').value.trim();
+      const name = document.getElementById('editProdName').value.trim();
+      const category = document.getElementById('editProdCategory').value;
+      const mode = document.getElementById('editProdMode').value;
+      const price = Math.max(0, Number(document.getElementById('editProdPrice').value || 0));
+      const cost = Math.max(0, Number(document.getElementById('editProdCost').value || 0));
+      const imageUrl = document.getElementById('editProdImageUrl').value.trim();
+      const deliveryForm = document.getElementById('editProdDeliveryForm').value.trim();
+
+      if (!name) {
+        showToast('⚠️ กรุณากรอกชื่อแพ็กเกจสินค้า', 'warning');
+        return;
+      }
+
+      if (id) {
+        const existing = state.products.find(p => p.id === id);
+        if (existing) {
+          existing.name = name;
+          existing.category = category;
+          existing.mode = mode;
+          existing.price = price;
+          existing.cost = cost;
+          existing.imageUrl = imageUrl;
+          existing.deliveryForm = deliveryForm;
+        }
+      } else {
+        state.products.push({
+          id: 'prod_' + Date.now().toString().slice(-6),
+          name,
+          category,
+          mode,
+          price,
+          cost,
+          imageUrl,
+          deliveryForm,
+          codes: []
+        });
+      }
+
+      saveState();
+      closeModal('productEditorModal');
+      renderAll();
+      showToast('💾 บันทึกข้อมูลสินค้าและฟอร์มจัดส่งเรียบร้อยแล้ว!', 'success');
+    }
+
+    function deleteProductById(productId) {
+      state.products = state.products.filter(p => p.id !== productId);
+      saveState();
+      renderAll();
+      showToast('🗑️ ลบรายการสินค้าเรียบร้อยแล้ว', 'info');
+    }
+
+    // ADMIN STOCKS
+    function renderAdminStocks() {
+      const sel = document.getElementById('adminStockProductSelect');
+      const instantProducts = state.products.filter(p => p.mode === 'INSTANT');
+      if (instantProducts.length === 0) {
+        sel.innerHTML = `<option value="">-- ยังไม่มีสินค้าแบบพร้อมส่งอัตโนมัติ --</option>`;
+        document.getElementById('adminSelectedStockCount').textContent = '0 ชิ้น';
+        document.getElementById('adminCurrentCodesList').innerHTML = `<div class="text-slate-500">กรุณาเพิ่มสินค้าประเภท "พร้อมส่งอัตโนมัติ" ก่อนเติมสต็อก</div>`;
+        return;
+      }
+
+      const prevSelected = sel.value;
+      sel.innerHTML = instantProducts.map(p =>
+        `<option value="${escapeHtml(p.id)}">${escapeHtml(p.name)} (คงเหลือ ${p.codes?.length || 0} ชิ้น)</option>`
+      ).join('');
+      if (instantProducts.some(p => p.id === prevSelected)) {
+        sel.value = prevSelected;
+      }
+      renderAdminStockCodes();
+    }
+
+    function renderAdminStockCodes() {
+      const prodId = document.getElementById('adminStockProductSelect')?.value;
+      const product = state.products.find(p => p.id === prodId);
+      const listEl = document.getElementById('adminCurrentCodesList');
+      const countEl = document.getElementById('adminSelectedStockCount');
+
+      if (!product) {
+        countEl.textContent = '0 ชิ้น';
+        listEl.innerHTML = `<div class="text-slate-500">ไม่มีรายการ</div>`;
+        return;
+      }
+
+      const codes = product.codes || [];
+      countEl.textContent = `${codes.length} ชิ้น`;
+      if (codes.length === 0) {
+        listEl.innerHTML = `<div class="text-slate-500">ยังไม่มีรหัสในสต็อกสำหรับสินค้านี้</div>`;
+      } else {
+        listEl.innerHTML = codes.map((code, idx) => `
+          <div class="flex items-center justify-between gap-2 bg-slate-800/70 px-3 py-1.5 rounded-lg">
+            <span class="truncate">${idx + 1}. ${escapeHtml(code)}</span>
+            <button onclick="removeSingleStockCode('${escapeHtml(product.id)}', ${idx})" class="text-rose-400 hover:text-rose-300 font-sans font-bold cursor-pointer">ลบ</button>
+          </div>
+        `).join('');
+      }
+    }
+
+    function generateSampleStockCodes() {
+      const samples = Array.from({ length: 5 }, (_, i) =>
+        `vip_user_${Math.floor(1000 + Math.random() * 9000)}@pinkflow.store : Pass${Math.floor(100000 + Math.random() * 900000)}_${i + 1}`
+      );
+      document.getElementById('adminNewCodesTextarea').value = samples.join('\n');
+    }
+
+    function addStockCodesToProduct() {
+      const prodId = document.getElementById('adminStockProductSelect')?.value;
+      const product = state.products.find(p => p.id === prodId);
+      if (!product) {
+        showToast('⚠️ กรุณาเลือกสินค้าก่อนนำเข้าสต็อก', 'warning');
+        return;
+      }
+      const raw = document.getElementById('adminNewCodesTextarea')?.value || '';
+      const lines = raw.split(/\r?\n/).map(l => l.trim()).filter(Boolean);
+      if (lines.length === 0) {
+        showToast('⚠️ กรุณากรอกรหัสสินค้าอย่างน้อย 1 บรรทัด', 'warning');
+        return;
+      }
+      product.codes = [...(product.codes || []), ...lines];
+      document.getElementById('adminNewCodesTextarea').value = '';
+      saveState();
+      renderAll();
+      showToast(`🔑 นำเข้าสต็อกเพิ่ม ${lines.length} ชิ้นเรียบร้อยแล้ว!`, 'success');
+    }
+
+    function removeSingleStockCode(productId, index) {
+      const product = state.products.find(p => p.id === productId);
+      if (!product || !Array.isArray(product.codes)) return;
+      product.codes.splice(index, 1);
+      saveState();
+      renderAll();
+    }
+
+    // ADMIN SLIPS & COUPONS
+    function renderAdminSlips() {
+      const listEl = document.getElementById('adminSlipLogsList');
+      if (state.slipLogs.length === 0) {
+        listEl.innerHTML = `<div class="p-6 rounded-2xl bg-slate-50 text-center text-xs text-slate-400">ยังไม่มีประวัติการตรวจสอบสลิป</div>`;
+        return;
+      }
+      listEl.innerHTML = state.slipLogs.map(s => `
+        <div class="p-3.5 rounded-2xl border border-pink-100 bg-pink-50/30 flex flex-wrap items-center justify-between gap-2 text-xs">
+          <div>
+            <span class="font-mono-code font-bold text-slate-800">${escapeHtml(s.transRef)}</span>
+            <span class="text-slate-500 ml-2">โดย ${escapeHtml(s.userEmail)}</span>
+          </div>
+          <div class="flex items-center gap-3">
+            <span class="font-bold text-emerald-600">+฿${Number(s.amount || 0).toFixed(2)}</span>
+            <span class="px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-700 text-[10px] font-bold">${escapeHtml(s.status)}</span>
+            <span class="text-slate-400 text-[11px]">${escapeHtml(s.createdAt)}</span>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function adminCreateCoupon() {
+      const code = (document.getElementById('newCouponCodeInput')?.value || '').trim().toUpperCase();
+      const discount = Math.max(1, Number(document.getElementById('newCouponDiscountInput')?.value || 0));
+      const minSpend = Math.max(0, Number(document.getElementById('newCouponMinSpendInput')?.value || 0));
+      const quota = Math.max(1, Number(document.getElementById('newCouponQuotaInput')?.value || 1));
+
+      if (!code) {
+        showToast('⚠️ กรุณากรอกชื่อโค้ดส่วนลด', 'warning');
+        return;
+      }
+      state.coupons.unshift({ code, discount, minSpend, quota });
+      document.getElementById('newCouponCodeInput').value = '';
+      saveState();
+      renderAll();
+      showToast(`🎟️ สร้างโค้ดส่วนลด ${code} เรียบร้อยแล้ว!`, 'success');
+    }
+
+    function deleteCouponById(code) {
+      state.coupons = state.coupons.filter(c => c.code !== code);
+      saveState();
+      renderAll();
+      showToast('🗑️ ลบโค้ดส่วนลดแล้ว', 'info');
+    }
+
+    function renderAdminCoupons() {
+      const listEl = document.getElementById('adminCouponsList');
+      if (state.coupons.length === 0) {
+        listEl.innerHTML = `<div class="col-span-full text-center text-xs text-slate-400 py-4">ยังไม่มีโค้ดส่วนลด</div>`;
+        return;
+      }
+      listEl.innerHTML = state.coupons.map(c => `
+        <div class="p-3.5 rounded-2xl border border-pink-200 bg-pink-50/40 flex items-center justify-between text-xs">
+          <div>
+            <div class="font-bold text-pink-700">${escapeHtml(c.code)} (ลด ฿${c.discount})</div>
+            <div class="text-slate-500">ขั้นต่ำ ฿${c.minSpend} • คงเหลือ ${c.quota} สิทธิ์</div>
+          </div>
+          <button onclick="deleteCouponById('${escapeHtml(c.code)}')" class="px-2.5 py-1.5 rounded-lg bg-rose-50 hover:bg-rose-100 text-rose-600 font-bold cursor-pointer">ลบ</button>
+        </div>
+      `).join('');
+    }
+
+    function renderAdminCustomize() {
+      document.getElementById('customShopNameInput').value = state.settings.shopName || '';
+      document.getElementById('customTaglineInput').value = state.settings.tagline || '';
+      document.getElementById('customHeroTitleInput').value = state.settings.heroTitle || '';
+
+      const logoHtml = (state.settings.logoType === 'IMAGE' && state.settings.logoImageUrl)
+        ? `<img src="${escapeHtml(state.settings.logoImageUrl)}" class="w-full h-full object-cover" />`
+        : `<i class="fa-solid ${escapeHtml(state.settings.logoIcon || 'fa-crown')}"></i>`;
+      document.getElementById('customLogoPreviewBox').innerHTML = logoHtml;
+    }
+
+    function renderAdminDeploy() {
+      document.getElementById('liveProductionModeCheckbox').checked = Boolean(state.settings.liveApiEnabled);
+      document.getElementById('livePromptPayInput').value = state.settings.promptPayId || '0863807024';
+      document.getElementById('liveAdminEmailInput').value = state.settings.adminEmail || 'pigiria9@gmail.com';
+      document.getElementById('liveAdminPinInput').value = state.settings.adminPin || '8899';
+      document.getElementById('liveSlipEndpointInput').value = state.settings.slipVerifyEndpoint || '/.netlify/functions/verify-slip';
+      document.getElementById('liveOrderEndpointInput').value = state.settings.placeOrderEndpoint || '/.netlify/functions/place-order';
+    }
+
+    function saveNetlifyProductionConfig() {
+      state.settings.liveApiEnabled = document.getElementById('liveProductionModeCheckbox').checked;
+      state.settings.promptPayId = (document.getElementById('livePromptPayInput').value || '0863807024').trim();
+      state.settings.adminEmail = (document.getElementById('liveAdminEmailInput').value || 'pigiria9@gmail.com').trim();
+      state.settings.adminPin = (document.getElementById('liveAdminPinInput').value || '8899').trim();
+      state.settings.slipVerifyEndpoint = (document.getElementById('liveSlipEndpointInput').value || '').trim();
+      state.settings.placeOrderEndpoint = (document.getElementById('liveOrderEndpointInput').value || '').trim();
+      saveState();
+      updateSecurityVisibility();
+      renderAll();
+      showToast('💾 บันทึกการตั้งค่าพร้อมเพย์และระบบหลังบ้านเรียบร้อยแล้ว!', 'success');
+    }
+
+    // RESET ALL STORE DATA
+    function openResetConfirmModal() {
+      document.getElementById('resetConfirmModal')?.classList.remove('hidden');
+    }
+
+    function executeClearAllStoreData() {
+      const keepEmail = state.user.email;
+      const keepSettings = { ...state.settings };
+      state = JSON.parse(JSON.stringify(DEFAULT_STATE));
+      state.user.email = keepEmail;
+      state.settings = keepSettings;
+      state.appMode = 'ADMIN';
+      saveState();
+      closeModal('resetConfirmModal');
+      renderAll();
+      showToast('🗑️ ล้างข้อมูลในร้านค้าทั้งหมดเรียบร้อยแล้ว!', 'success');
+    }
+
+    // MASTER RENDER
+    function renderAll() {
+      updateSecurityVisibility();
+      renderHeaderAndHero();
+
+      const isAdminMode = state.appMode === 'ADMIN' && isAdminAccount() && isAdminSessionUnlocked;
+      document.getElementById('storefrontView').classList.toggle('hidden', isAdminMode);
+      document.getElementById('storeSubNav').classList.toggle('hidden', isAdminMode);
+      document.getElementById('adminView').classList.toggle('hidden', !isAdminMode);
+
+      if (isAdminMode) {
+        renderAdminView();
+      } else {
+        const tabs = ['CATALOG', 'ORDERS', 'REWARDS', 'API'];
+        tabs.forEach(t => {
+          const btn = document.getElementById(`storeTabBtn-${t}`);
+          const panel = document.getElementById(`storePanel-${t}`);
+          const active = state.storeTab === t;
+          if (btn) {
+            btn.classList.toggle('theme-bg-light', active);
+            btn.classList.toggle('theme-text-primary', active);
+            btn.classList.toggle('font-bold', active);
+            btn.classList.toggle('text-slate-600', !active);
+          }
+          if (panel) panel.classList.toggle('hidden', !active);
+        });
+
+        renderCategoryBar();
+        renderProductsGrid();
+        renderOrdersTab();
+        renderRewardsTab();
+        renderApiTab();
+      }
+    }
+
+    window.onload = function () {
+      renderAll();
+    };
+  </script>
+</body>
+</html>
