@@ -713,18 +713,6 @@
             </label>
             <div id="slipQrScanStatus" class="hidden mt-2 px-3 py-2 rounded-xl text-[11px] font-semibold"></div>
           </div>
-        </div>
-
-        <div class="md:col-span-6 space-y-4">
-          <div>
-            <label class="block text-xs font-bold text-slate-700 mb-1.5">แนบรูปสลิปโอนเงินจริง</label>
-            <label class="flex flex-col items-center justify-center p-4 rounded-2xl border-2 border-dashed border-pink-300 bg-pink-50/40 hover:bg-pink-50 cursor-pointer transition text-center">
-              <i class="fa-solid fa-cloud-arrow-up text-2xl theme-text-primary mb-1"></i>
-              <span class="text-xs font-bold text-slate-700">คลิกเลือกรูปสลิปโอนเงิน</span>
-              <span class="text-[11px] text-slate-400">ส่งตรวจกับ API อัตโนมัติ (Slip2Go / EasySlip)</span>
-              <input type="file" accept="image/*" onchange="handleRealSlipFileUpload(event)" class="hidden" />
-            </label>
-          </div>
 
           <!-- ปุ่มจำลองตรวจสลิป: ซ่อนจากลูกค้าทั่วไปโดยสมบูรณ์ (แสดงเฉพาะแอดมินที่ปลดล็อก PIN แล้วเท่านั้น) -->
           <div id="adminSlipSimulatorBox" class="hidden space-y-1.5">
@@ -1910,61 +1898,6 @@
         previewEl.textContent = JSON.stringify({ status: 'error', message: err.message }, null, 2);
         showToast('❌ ไม่สามารถเชื่อมต่อระบบตรวจสลิปได้', 'error');
       }
-    }
-
-    function handleRealSlipFileUpload(event) {
-      const file = event.target.files?.[0];
-      if (!file) return;
-      if (!state.user.email) {
-        showToast('กรุณากรอกอีเมลก่อนแนบสลิป', 'warning');
-        openEmailLoginModal();
-        return;
-      }
-
-      const previewEl = document.getElementById('easySlipJsonPreview');
-      previewEl.textContent = JSON.stringify({ status: 'verifying_slip...', file: file.name }, null, 2);
-
-      const reader = new FileReader();
-      reader.onload = async function(e) {
-        const imageBase64 = e.target.result;
-        try {
-          const res = await fetch(state.settings.slipVerifyEndpoint || '/.netlify/functions/verify-slip', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              imageBase64,
-              mimeType: file.type || 'image/jpeg',
-              userEmail: state.user.email
-            })
-          });
-          const data = await res.json();
-          previewEl.textContent = JSON.stringify(data, null, 2);
-
-          if (res.ok && data.success) {
-            const added = Number(data.amount || 0);
-            state.user.balance = typeof data.newBalance === 'number'
-              ? data.newBalance
-              : Number(state.user.balance || 0) + added;
-
-            state.slipLogs.unshift({
-              transRef: data.transRef || ('REF-' + Date.now()),
-              userEmail: state.user.email,
-              amount: added,
-              status: 'VERIFIED',
-              createdAt: new Date().toLocaleString('th-TH')
-            });
-            saveState();
-            renderAll();
-            showToast(`✅ ตรวจสอบสลิปสำเร็จ! เติมเครดิต +฿${added.toFixed(2)} แล้ว`, 'success');
-          } else {
-            showToast(`❌ ${data.error || 'ตรวจสอบสลิปไม่ผ่าน'}`, 'error');
-          }
-        } catch (err) {
-          previewEl.textContent = JSON.stringify({ status: 'error', message: err.message }, null, 2);
-          showToast('❌ ไม่สามารถเชื่อมต่อระบบตรวจสลิปได้', 'error');
-        }
-      };
-      reader.readAsDataURL(file);
     }
 
     function simulateSlipVerify(resultType) {
