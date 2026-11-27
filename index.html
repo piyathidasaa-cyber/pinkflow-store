@@ -953,8 +953,11 @@
     function saveState() {
       try {
         localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+        return true;
       } catch (e) {
         console.warn('Unable to save local state:', e);
+        showToast('⚠️ พื้นที่จัดเก็บเต็ม กรุณาใช้รูปภาพขนาดเล็กลง', 'warning');
+        return false;
       }
     }
 
@@ -1183,35 +1186,88 @@
       state.settings.logoImageUrl = '';
       const urlInput = document.getElementById('customLogoUrlInput');
       if (urlInput) urlInput.value = '';
-      renderAdminCustomize();
+      saveState();
+      renderAll();
+      showToast('✨ เปลี่ยนไอคอนโลโก้เรียบร้อยแล้ว!', 'success');
     }
 
-    function handleLogoFileUpload(event) {
+    function normalizeDirectImageUrl(url) {
+      const clean = (url || '').trim();
+      if (!clean) return '';
+      const driveMatch = clean.match(/drive\.google\.com\/(?:file\/d\/|open\?id=)([a-zA-Z0-9_-]+)/);
+      if (driveMatch && driveMatch[1]) {
+        return `https://drive.google.com/thumbnail?id=${driveMatch[1]}&sz=w400`;
+      }
+      return clean;
+    }
+
+    function compressLogoToDataUrl(file) {
+      return new Promise((resolve, reject) => {
+        const objectUrl = URL.createObjectURL(file);
+        const img = new Image();
+        img.onload = function () {
+          try {
+            const maxSize = 256;
+            const scale = Math.min(1, maxSize / Math.max(img.width || 1, img.height || 1));
+            const w = Math.max(1, Math.round((img.width || maxSize) * scale));
+            const h = Math.max(1, Math.round((img.height || maxSize) * scale));
+            const canvas = document.createElement('canvas');
+            canvas.width = w;
+            canvas.height = h;
+            const ctx = canvas.getContext('2d');
+            ctx.drawImage(img, 0, 0, w, h);
+
+            let dataUrl = canvas.toDataURL('image/png');
+            if (dataUrl.length > 180000) {
+              dataUrl = canvas.toDataURL('image/jpeg', 0.88);
+            }
+            URL.revokeObjectURL(objectUrl);
+            resolve(dataUrl);
+          } catch (err) {
+            URL.revokeObjectURL(objectUrl);
+            reject(err);
+          }
+        };
+        img.onerror = function () {
+          URL.revokeObjectURL(objectUrl);
+          reject(new Error('ไม่สามารถอ่านไฟล์รูปภาพได้'));
+        };
+        img.src = objectUrl;
+      });
+    }
+
+    async function handleLogoFileUpload(event) {
       const file = event.target.files?.[0];
+      event.target.value = '';
       if (!file) return;
-      const reader = new FileReader();
-      reader.onload = function(e) {
+      try {
+        const compressedUrl = await compressLogoToDataUrl(file);
         state.settings.logoType = 'IMAGE';
-        state.settings.logoImageUrl = e.target.result;
+        state.settings.logoImageUrl = compressedUrl;
         const urlInput = document.getElementById('customLogoUrlInput');
         if (urlInput) urlInput.value = '';
-        renderAdminCustomize();
-      };
-      reader.readAsDataURL(file);
+        if (saveState()) {
+          renderAll();
+          showToast('✅ อัปโหลดและเปลี่ยนโลโก้ร้านค้าเรียบร้อยแล้ว!', 'success');
+        }
+      } catch (err) {
+        showToast('❌ ไม่สามารถอัปโหลดรูปโลโก้ได้ กรุณาลองใช้ไฟล์ JPG หรือ PNG', 'error');
+      }
     }
 
     function saveStoreCustomization() {
       state.settings.shopName = (document.getElementById('customShopNameInput')?.value || 'PinkFlow Store').trim();
       state.settings.tagline = (document.getElementById('customTaglineInput')?.value || '').trim();
       state.settings.heroTitle = (document.getElementById('customHeroTitleInput')?.value || '').trim();
-      const customUrl = (document.getElementById('customLogoUrlInput')?.value || '').trim();
-      if (customUrl) {
+      const rawUrl = (document.getElementById('customLogoUrlInput')?.value || '').trim();
+      if (rawUrl) {
         state.settings.logoType = 'IMAGE';
-        state.settings.logoImageUrl = customUrl;
+        state.settings.logoImageUrl = normalizeDirectImageUrl(rawUrl);
       }
-      saveState();
-      renderAll();
-      showToast('💾 บันทึกการตกแต่งร้านค้าเรียบร้อยแล้ว!', 'success');
+      if (saveState()) {
+        renderAll();
+        showToast('💾 บันทึกการตกแต่งร้านค้าเรียบร้อยแล้ว!', 'success');
+      }
     }
 
     function renderHeaderAndHero() {
@@ -1221,7 +1277,7 @@
       document.getElementById('heroTitleText').textContent = state.settings.heroTitle || '';
 
       const logoHtml = (state.settings.logoType === 'IMAGE' && state.settings.logoImageUrl)
-        ? `<img src="${escapeHtml(state.settings.logoImageUrl)}" alt="Logo" class="w-full h-full object-cover" onerror="this.style.display='none'" />`
+        ? `<img src="${escapeHtml(state.settings.logoImageUrl)}" alt="Logo" class="w-full h-full object-cover" onerror="this.parentElement.innerHTML='<i class=\\'fa-solid fa-crown\\'></i>'; showToast('⚠️ โหลดรูปภาพโลโก้จาก URL ไม่สำเร็จ กรุณาอัปโหลดไฟล์ภาพแทน', 'warning');" />`
         : `<i class="fa-solid ${escapeHtml(state.settings.logoIcon || 'fa-crown')}"></i>`;
 
       document.getElementById('headerLogoContainer').innerHTML = logoHtml;
