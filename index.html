@@ -291,6 +291,9 @@
             🚀 ตั้งค่า API & พร้อมเพย์
           </button>
         </div>
+        <button onclick="lockAdminSession()" class="px-3 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold transition cursor-pointer">
+          🔒 ล็อกหลังบ้าน
+        </button>
       </div>
 
       <!-- ADMIN OVERVIEW -->
@@ -846,7 +849,18 @@
   <div id="toastContainer" class="fixed bottom-4 right-4 z-50 space-y-2 max-w-sm pointer-events-none"></div>
 
   <script>
-    const STORAGE_KEY = 'pinkflow_store_clean_forms_v12';
+    const STORAGE_KEY = 'pinkflow_store_clean_forms_v13';
+
+    // ล้างแคชข้อมูลเก่าจากเวอร์ชันก่อนหน้าอัตโนมัติ
+    (function purgeLegacyCache() {
+      try {
+        Object.keys(localStorage).forEach(k => {
+          if (k.startsWith('pinkflow_') && k !== STORAGE_KEY) {
+            localStorage.removeItem(k);
+          }
+        });
+      } catch (e) {}
+    })();
 
     const THEME_PRESETS = {
       rose:   { primary: '#ec4899', hover: '#db2777', light: '#fdf2f8', border: '#fbcfe8', soft: '#fff7fa' },
@@ -1026,6 +1040,15 @@
       saveState();
       updateSecurityVisibility();
       renderAll();
+    }
+
+    function lockAdminSession() {
+      isAdminSessionUnlocked = false;
+      state.appMode = 'STORE';
+      saveState();
+      updateSecurityVisibility();
+      renderAll();
+      showToast('🔒 ล็อกระบบหลังบ้านเรียบร้อยแล้ว', 'info');
     }
 
     function verifyAdminPinAndEnter() {
@@ -1831,7 +1854,6 @@
     }
 
     function renderAdminOverview() {
-      const completedOrders = state.orders.filter(o => o.status === 'COMPLETED');
       const totalSales = state.orders.reduce((sum, o) => sum + Number(o.totalPaid || 0), 0);
       const totalCost = state.orders.reduce((sum, o) => {
         const prod = state.products.find(p => p.id === o.productId);
