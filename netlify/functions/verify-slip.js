@@ -17,12 +17,25 @@ export async function handler(event) {
     let slipTime = 0;
     let receiverAccNumbers = '';
 
+    const slip2goSecret = (
+      process.env.SLIP2GO_API_SECRET ||
+      process.env.SLIP2GO_SECRET_KEY ||
+      process.env.SLIP2GO_SECRET ||
+      ''
+    ).trim();
+
+    const easySlipToken = (
+      process.env.EASYSLIP_ACCESS_TOKEN ||
+      process.env.EASYSLIP_API_KEY ||
+      ''
+    ).trim();
+
     // โหมดที่ 1: ใช้ Slip2Go API (รองรับทั้งส่งรหัส qrCode ตรงและรูป Base64)
-    if (process.env.SLIP2GO_API_SECRET) {
+    if (slip2goSecret) {
       let baseOrigin = 'https://connect.slip2go.com';
       if (process.env.SLIP2GO_VERIFY_URL) {
         try {
-          baseOrigin = new URL(process.env.SLIP2GO_VERIFY_URL).origin;
+          baseOrigin = new URL(process.env.SLIP2GO_VERIFY_URL.trim()).origin;
         } catch (e) {}
       }
 
@@ -35,7 +48,7 @@ export async function handler(event) {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
-            Authorization: `Bearer ${process.env.SLIP2GO_API_SECRET}`,
+            Authorization: `Bearer ${slip2goSecret}`,
           },
           body: JSON.stringify({ payload: { qrCode } }),
         });
@@ -53,7 +66,7 @@ export async function handler(event) {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
-            Authorization: `Bearer ${process.env.SLIP2GO_API_SECRET}`,
+            Authorization: `Bearer ${slip2goSecret}`,
           },
           body: JSON.stringify({ payload: { imageBase64 } }),
         });
@@ -83,7 +96,7 @@ export async function handler(event) {
       receiverAccNumbers = JSON.stringify(slip.receiver || '').replace(/\D/g, '');
     }
     // โหมดที่ 2: ใช้ EasySlip API v1
-    else if (process.env.EASYSLIP_ACCESS_TOKEN) {
+    else if (easySlipToken) {
       const base64Clean = (imageBase64 || '').replace(/^data:image\/\w+;base64,/, '');
       const buffer = Buffer.from(base64Clean, 'base64');
       const blob = new Blob([buffer], { type: mimeType || 'image/jpeg' });
@@ -92,7 +105,7 @@ export async function handler(event) {
 
       const easyRes = await fetch('https://developer.easyslip.com/api/v1/verify', {
         method: 'POST',
-        headers: { Authorization: `Bearer ${process.env.EASYSLIP_ACCESS_TOKEN}` },
+        headers: { Authorization: `Bearer ${easySlipToken}` },
         body: formData,
       });
       const easyData = await easyRes.json();
